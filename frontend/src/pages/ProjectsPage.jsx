@@ -1,8 +1,21 @@
+import { useEffect, useState } from "react";
 import { PageHero } from "../components/ui/PageHero";
 import { ProjectCard } from "../components/ui/ProjectCard";
-import { featuredProjects } from "../data/mockData";
+import { api } from "../lib/api";
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    api.get("/projects")
+      .then((res) => {
+        if (res.data?.success) {
+          setProjects(res.data.data);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <div>
       <PageHero
@@ -22,11 +35,17 @@ export default function ProjectsPage() {
             <option>Agriculture</option>
           </select>
         </div>
-        <div className="grid gap-6 lg:grid-cols-3">
-          {featuredProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
+        {projects.length > 0 ? (
+          <div className="grid gap-6 lg:grid-cols-3">
+            {projects.map((project) => (
+              <ProjectCard key={project._id || project.id} project={project} />
+            ))}
+          </div>
+        ) : (
+          <div className="py-20 text-center text-slate-500">
+            <p>No projects found yet. Be the first to add one!</p>
+          </div>
+        )}
       </section>
     </div>
   );

@@ -1,8 +1,21 @@
+import { useEffect, useState } from "react";
 import { FeedCard } from "../components/ui/FeedCard";
 import { PageHero } from "../components/ui/PageHero";
-import { feedPosts } from "../data/mockData";
+import { api } from "../lib/api";
 
 export default function FeedPage() {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    api.get("/posts")
+      .then((res) => {
+        if (res.data?.success) {
+          setPosts(res.data.data);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <div>
       <PageHero
@@ -12,9 +25,15 @@ export default function FeedPage() {
       />
       <section className="section-shell grid gap-6 py-8 lg:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-6">
-          {feedPosts.map((post) => (
-            <FeedCard key={post.id} post={post} />
-          ))}
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <FeedCard key={post._id || post.id} post={post} />
+            ))
+          ) : (
+            <div className="py-10 text-center text-slate-500 glass-card">
+              <p>No posts yet in the community. Be the first to start a discussion!</p>
+            </div>
+          )}
         </div>
         <aside className="space-y-6">
           <div className="glass-card p-6">

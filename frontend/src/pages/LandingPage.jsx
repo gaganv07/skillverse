@@ -1,13 +1,41 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { featuredProjects, successStories, testimonials, trendingTalents } from "../data/mockData";
 import { useLanguage } from "../providers/LanguageProvider";
 import { SectionHeader } from "../components/ui/SectionHeader";
 import { StatCard } from "../components/ui/StatCard";
 import { ProjectCard } from "../components/ui/ProjectCard";
+import { api } from "../lib/api";
+
+const successStories = [
+  { name: "Meghana", text: "SkillVerse helped my science fair project reach mentors and district judges." },
+  { name: "Arjun", text: "I built a portfolio that made my school recognize my robotics work." }
+];
+
+const testimonials = [
+  { author: "Science Teacher, Bengaluru Rural", quote: "This gives students the digital confidence and visibility they deserve." },
+  { author: "Innovation Mentor, Karnataka", quote: "A strong bridge between talent in classrooms and real-world opportunities." }
+];
 
 export default function LandingPage() {
   const { t } = useLanguage();
+  const [featuredProjects, setFeaturedProjects] = useState([]);
+  const [trendingTalents, setTrendingTalents] = useState([]);
+
+  useEffect(() => {
+    // Fetch real data from backend
+    api.get("/projects").then((res) => {
+      if (res.data?.success) {
+        setFeaturedProjects(res.data.data.slice(0, 3));
+      }
+    }).catch(console.error);
+
+    api.get("/talents").then((res) => {
+      if (res.data?.success) {
+        setTrendingTalents(res.data.data.slice(0, 3));
+      }
+    }).catch(console.error);
+  }, []);
 
   return (
     <div className="pb-16">

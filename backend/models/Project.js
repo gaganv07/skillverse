@@ -14,14 +14,15 @@ const projectSchema = new mongoose.Schema(
       type: String,
       enum: [
         "science",
-        "coding",
-        "robotics",
+        "technology",
         "agriculture",
+        "robotics",
         "environment",
+        "engineering",
+        "ai-coding",
         "research",
-        "business",
-        "startup",
-        "social-impact"
+        "sustainability",
+        "innovation"
       ],
       required: true
     },

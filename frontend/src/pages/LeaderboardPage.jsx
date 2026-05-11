@@ -24,7 +24,7 @@ export default function LeaderboardPage() {
       <PageHero
         badge="Leaderboards"
         title="Recognition through transparent rankings and community momentum"
-        description="Track top students, most liked projects, best-performing schools, talent stars, and innovation leaders."
+        description="Track top students, most liked projects, best-performing schools, engineering stars, and innovation leaders."
       />
       <section className="section-shell grid gap-6 py-8 md:grid-cols-2">
         <div className="glass-card p-8">

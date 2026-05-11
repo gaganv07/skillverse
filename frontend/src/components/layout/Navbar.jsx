@@ -5,7 +5,6 @@ import { useAuth } from "../../providers/AuthProvider";
 
 const links = [
   { to: "/projects", label: "Projects" },
-  { to: "/talents", label: "Talents" },
   { to: "/feed", label: "Community" },
   { to: "/competitions", label: "Events" },
   { to: "/leaderboards", label: "Leaderboards" }

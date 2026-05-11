@@ -21,8 +21,8 @@ export default function CompetitionsPage() {
     <div>
       <PageHero
         badge="Events and competitions"
-        title="Discover challenges that reward talent, effort, and impact"
-        description="Science fairs, innovation contests, hackathons, and talent competitions can be published with banners, deadlines, registration, and winner announcements."
+        title="Discover challenges that reward innovation, effort, and impact"
+        description="Science fairs, innovation contests, hackathons, and engineering competitions can be published with banners, deadlines, registration, and winner announcements."
       />
       <section className="section-shell py-8">
         {loading ? (

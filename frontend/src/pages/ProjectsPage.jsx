@@ -30,9 +30,16 @@ export default function ProjectsPage() {
           <input className="rounded-2xl border border-slate-300 bg-white/70 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/70" placeholder="District" />
           <select className="rounded-2xl border border-slate-300 bg-white/70 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/70">
             <option>All Categories</option>
-            <option>Science</option>
-            <option>Coding</option>
-            <option>Agriculture</option>
+            <option value="science">Science</option>
+            <option value="technology">Technology</option>
+            <option value="agriculture">Agriculture</option>
+            <option value="robotics">Robotics</option>
+            <option value="environment">Environment</option>
+            <option value="engineering">Engineering</option>
+            <option value="ai-coding">AI & Coding</option>
+            <option value="research">Research</option>
+            <option value="sustainability">Sustainability</option>
+            <option value="innovation">Innovation</option>
           </select>
         </div>
         {projects.length > 0 ? (

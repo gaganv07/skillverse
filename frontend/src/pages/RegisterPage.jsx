@@ -40,7 +40,7 @@ export default function RegisterPage() {
           ></div>
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Namma Karnataka</span>
         </div>
-        <PageHero badge="Join SkillVerse" title="Create a profile that reflects talent and future potential" description="Students and teachers can join the ecosystem with a polished, role-aware onboarding flow." />
+        <PageHero badge="Join SkillVerse" title="Create a profile that reflects science and future potential" description="Students and teachers can join the ecosystem with a polished, role-aware onboarding flow." />
       </div>
       <section className="section-shell max-w-3xl py-8">
         <form onSubmit={handleSubmit} className="glass-card grid gap-5 p-8 md:grid-cols-2">

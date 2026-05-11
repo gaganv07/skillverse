@@ -4,7 +4,7 @@ import { api } from "../lib/api";
 
 export default function AdminDashboardPage() {
   const [users, setUsers] = useState([]);
-  const [stats, setStats] = useState({ users: 0, projects: 0, talents: 0, competitions: 0 });
+  const [stats, setStats] = useState({ users: 0, projects: 0, competitions: 0 });
   const [loading, setLoading] = useState(true);
   
   // Search & Filter state
@@ -94,14 +94,13 @@ export default function AdminDashboardPage() {
       <PageHero
         badge="Admin command center"
         title="Manage the ecosystem with analytics, moderation, and announcements"
-        description="Admins can oversee users, projects, talents, competitions, certificates, moderation workflows, and featured content."
+        description="Admins can oversee users, projects, competitions, certificates, moderation workflows, and featured content."
       />
       
-      <section className="section-shell grid gap-6 py-8 md:grid-cols-4">
+      <section className="section-shell grid gap-6 py-8 md:grid-cols-3">
         {[
           { label: "Users", value: stats.users },
           { label: "Projects", value: stats.projects },
-          { label: "Talents", value: stats.talents },
           { label: "Competitions", value: stats.competitions }
         ].map((stat) => (
           <div key={stat.label} className="glass-card p-6">

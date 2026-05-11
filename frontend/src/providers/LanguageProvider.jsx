@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from "react";
 
 const dictionary = {
   English: {
-    tagline: "Where Government School Students Showcase Innovation & Talent",
+    tagline: "Where Government School Students Showcase Innovation & Engineering",
     heroCta: "Explore Student Work"
   },
   Hindi: {

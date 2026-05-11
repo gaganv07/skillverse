@@ -5,7 +5,7 @@ export default function ProfilePage() {
     <div>
       <PageHero
         badge="Student profile"
-        title="Professional student identity with projects, talents, and achievements"
+        title="Professional student identity with projects, research, and achievements"
         description="Each profile is designed like a next-generation educational portfolio with location, school, skills, achievements, social links, and verification state."
       />
       <section className="section-shell grid gap-6 py-8 lg:grid-cols-[0.9fr_1.1fr]">

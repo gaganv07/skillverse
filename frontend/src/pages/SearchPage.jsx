@@ -5,7 +5,7 @@ export default function SearchPage() {
     <div>
       <PageHero
         badge="Advanced search"
-        title="Discover talent by name, school, district, state, skill, and category"
+        title="Discover innovation by name, school, district, state, skill, and category"
         description="Search is designed to help organizers, teachers, and mentors quickly find students and projects with high future potential."
       />
       <section className="section-shell py-8">

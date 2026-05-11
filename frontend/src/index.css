@@ -1,0 +1,46 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-50 font-body text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+    background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.94), rgba(232, 244, 255, 0.8));
+  }
+
+  .dark body {
+    background-image: linear-gradient(to bottom right, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.95));
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-3xl border border-white/20 bg-white/60 shadow-2xl shadow-slate-200/40 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/55 dark:shadow-black/20;
+  }
+
+  .section-shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-title {
+    @apply font-display text-3xl font-bold tracking-tight sm:text-4xl;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full border border-brand-300/40 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:border-brand-400/20 dark:bg-brand-500/10 dark:text-brand-200;
+  }
+
+  .primary-button {
+    @apply inline-flex items-center justify-center rounded-full bg-brand-500 px-5 py-3 font-semibold text-white shadow-glow transition hover:bg-brand-600;
+  }
+
+  .secondary-button {
+    @apply inline-flex items-center justify-center rounded-full border border-slate-300/60 bg-white/60 px-5 py-3 font-semibold text-slate-800 transition hover:bg-white dark:border-slate-700 dark:bg-slate-900/60 dark:text-white dark:hover:bg-slate-900;
+  }
+}

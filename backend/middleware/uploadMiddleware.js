@@ -1,27 +1,39 @@
 import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary.js";
 
-const storage = multer.memoryStorage();
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    const allowedFolders = [
+      "skillverse/profiles",
+      "skillverse/projects",
+      "skillverse/talents",
+      "skillverse/documents"
+    ];
+    let folder = req.body.folder || "skillverse/documents";
+    if (!allowedFolders.includes(folder)) {
+      folder = "skillverse/documents";
+    }
 
-const fileFilter = (_req, file, cb) => {
-  const allowed = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "video/mp4",
-    "application/pdf"
-  ];
+    let resource_type = "auto";
+    if (file.mimetype.startsWith("video/")) {
+      resource_type = "video";
+    } else if (file.mimetype === "application/pdf") {
+      resource_type = "raw";
+    }
 
-  if (!allowed.includes(file.mimetype)) {
-    return cb(new Error("Unsupported file type"), false);
+    return {
+      folder: folder,
+      resource_type: resource_type,
+      allowed_formats: ["jpg", "jpeg", "png", "webp", "mp4", "pdf"]
+    };
   }
-
-  cb(null, true);
-};
+});
 
 export const upload = multer({
   storage,
-  fileFilter,
   limits: {
-    fileSize: 15 * 1024 * 1024
+    fileSize: 15 * 1024 * 1024 // 15MB validation limit
   }
 });

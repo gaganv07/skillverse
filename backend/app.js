@@ -25,6 +25,8 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 
 export const app = express();
 
+app.set("trust proxy", 1); // Trust the reverse proxy (Render/Vercel)
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,
@@ -34,7 +36,17 @@ const limiter = rateLimit({
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL?.split(",") || ["http://localhost:5173"],
+    origin: function (origin, callback) {
+      const allowedOrigins = process.env.CLIENT_URL?.split(",") || ["http://localhost:5173"];
+      // Allow requests with no origin (like mobile apps or curl requests)
+      // Allow specified origins
+      // Allow dynamic Vercel deployments
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true
   })
 );

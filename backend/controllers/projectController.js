@@ -5,6 +5,19 @@ import { catchAsync } from "../utils/catchAsync.js";
 import { buildQuery, paginate } from "../utils/apiFeatures.js";
 
 export const createProject = catchAsync(async (req, res) => {
+  // Prevent duplicate projects with the same title from the same student
+  const existingProject = await Project.findOne({
+    student: req.user._id,
+    title: req.body.title
+  });
+
+  if (existingProject) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "You have already uploaded a project with this title" 
+    });
+  }
+
   const project = await Project.create({
     ...req.body,
     student: req.user._id

@@ -20,7 +20,8 @@ export function Navbar() {
     <header className="fixed inset-x-0 top-0 z-50">
       <div className="section-shell py-4">
         <div className="glass-card flex items-center justify-between px-4 py-3 sm:px-6">
-          <Link to="/" className="font-display text-xl font-bold text-brand-700 dark:text-brand-200">
+          <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-brand-700 dark:text-brand-200">
+            <img src="/logo.png" alt="SkillVerse Logo" className="h-8 w-auto object-contain" />
             SkillVerse
           </Link>
           <nav className="hidden items-center gap-6 lg:flex">

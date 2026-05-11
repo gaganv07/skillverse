@@ -19,7 +19,7 @@ export const register = catchAsync(async (req, res) => {
 
   const existing = await User.findOne({ email });
   if (existing) {
-    return res.status(400).json({ success: false, message: "Email already registered" });
+    return res.status(400).json({ success: false, message: "Email already exists" });
   }
 
   const verificationToken = crypto.randomBytes(20).toString("hex");
@@ -42,12 +42,15 @@ export const register = catchAsync(async (req, res) => {
     await TeacherProfile.create({ user: user._id });
   }
 
-  respondWithAuth(res, {
-    id: user._id,
-    fullName: user.fullName,
-    email: user.email,
-    role: user.role,
-    emailVerified: user.emailVerified
+  res.status(201).json({
+    success: true,
+    message: "User account created successfully",
+    user: {
+      id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role
+    }
   });
 });
 

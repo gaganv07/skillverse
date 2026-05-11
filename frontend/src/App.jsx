@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { AppShell } from "./components/layout/AppShell";
+import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -19,19 +20,32 @@ export default function App() {
   return (
     <AppShell>
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/feed" element={<FeedPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/talents" element={<TalentsPage />} />
-        <Route path="/students/:id" element={<ProfilePage />} />
-        <Route path="/competitions" element={<CompetitionsPage />} />
         <Route path="/leaderboards" element={<LeaderboardPage />} />
-        <Route path="/teacher-dashboard" element={<TeacherDashboardPage />} />
-        <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/messages" element={<MessagesPage />} />
+
+        {/* Protected Routes (Any authenticated user) */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/feed" element={<FeedPage />} />
+          <Route path="/students/:id" element={<ProfilePage />} />
+          <Route path="/competitions" element={<CompetitionsPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/messages" element={<MessagesPage />} />
+        </Route>
+
+        {/* Role-based Protected Routes */}
+        <Route element={<ProtectedRoute allowedRoles={["teacher", "admin"]} />}>
+          <Route path="/teacher-dashboard" element={<TeacherDashboardPage />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+          <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+        </Route>
+
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AppShell>

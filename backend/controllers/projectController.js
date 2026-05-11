@@ -78,3 +78,15 @@ export const commentProject = catchAsync(async (req, res) => {
   await Project.findByIdAndUpdate(req.params.id, { $inc: { "metrics.comments": 1 } });
   res.status(201).json({ success: true, comment });
 });
+
+export const verifyProject = catchAsync(async (req, res) => {
+  const project = await Project.findById(req.params.id);
+  if (!project) {
+    return res.status(404).json({ success: false, message: "Project not found" });
+  }
+
+  project.status = req.body.status || "approved";
+  await project.save();
+
+  res.json({ success: true, project });
+});

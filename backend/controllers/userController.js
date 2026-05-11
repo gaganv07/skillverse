@@ -57,3 +57,32 @@ export const toggleFollow = catchAsync(async (req, res) => {
   await Follower.create({ follower: req.user._id, following: targetId });
   res.json({ success: true, following: true });
 });
+
+// Admin / Teacher specific management actions
+export const deleteUser = catchAsync(async (req, res) => {
+  const user = await User.findByIdAndDelete(req.params.id);
+  if (!user) {
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+  res.json({ success: true, message: "User deleted successfully" });
+});
+
+export const verifyUser = catchAsync(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+  user.isVerified = !user.isVerified;
+  await user.save();
+  res.json({ success: true, user });
+});
+
+export const toggleUserStatus = catchAsync(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+  user.isActive = !user.isActive;
+  await user.save();
+  res.json({ success: true, user });
+});

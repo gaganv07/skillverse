@@ -44,7 +44,7 @@ export default function LandingPage() {
           <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
             <span className="badge">Digital identity for school innovators</span>
             <h1 className="mt-6 font-display text-5xl font-extrabold tracking-tight sm:text-6xl">
-              Where Government School Students Showcase Innovation & Talent
+              {t.tagline}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
               SkillVerse helps students publish projects, talents, achievements, and future-ready ideas in a platform built to unlock recognition, mentorship, and opportunity.

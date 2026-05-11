@@ -1,4 +1,4 @@
-import Message from "../models\Message.js";
+import Message from "../models/Message.js";
 import { catchAsync } from "../utils/catchAsync.js";
 
 export const sendMessage = catchAsync(async (req, res) => {

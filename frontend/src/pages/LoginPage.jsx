@@ -16,6 +16,9 @@ export default function LoginPage() {
 
   return (
     <div>
+      <div className="flex justify-center pt-12 pb-4">
+        <img src="/logo.jpg" alt="SkillVerse Logo" className="w-24 h-24 object-cover rounded-2xl shadow-xl border-4 border-white dark:border-slate-800" />
+      </div>
       <PageHero badge="Authentication" title="Login to SkillVerse" description="Students, teachers, and admins can securely access their dashboards and portfolios." />
       <section className="section-shell max-w-2xl py-8">
         <form onSubmit={handleSubmit} className="glass-card space-y-5 p-8">

@@ -23,14 +23,14 @@ export default function LandingPage() {
         <div className="section-shell relative z-10 text-center">
           <div className="mb-8 flex justify-center">
             <span className="badge border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-800 dark:bg-brand-900/30 dark:text-brand-300">
-              India's premier student innovation portal for government schools
+              Karnataka's unified student skill & innovation ecosystem
             </span>
           </div>
           <h1 className="font-display text-5xl font-extrabold tracking-tight sm:text-7xl">
-            Empowering Karnataka's Students Through <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-yellow-500">Science & Innovation</span>
+            Empowering Karnataka's Students Through <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-yellow-500">Skills, Innovation & Real-World Learning</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 dark:text-slate-300">
-            A centralized platform showcasing student projects, research, and real-world skills. Explore innovations in technology, agriculture, engineering, and environmental sustainability.
+            A centralized platform where students showcase projects across science, technology, agriculture, arts, entrepreneurship, vocational skills, and real-world problem solving — powered by government schools across Karnataka.
           </p>
           <div className="mt-10 flex justify-center gap-4">
             <Link to="/projects" className="primary-button text-lg px-8 py-4">Explore Projects</Link>
@@ -49,22 +49,22 @@ export default function LandingPage() {
             <div className="w-14 h-14 mx-auto bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 rounded-2xl flex items-center justify-center mb-6">
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
             </div>
-            <h3 className="font-display text-xl font-bold mb-3">Scientific Research</h3>
-            <p className="text-slate-600 dark:text-slate-400">Discover science fair models, academic research, and breakthrough experiments uploaded directly by students.</p>
+            <h3 className="font-display text-xl font-bold mb-3">Science & Research</h3>
+            <p className="text-slate-600 dark:text-slate-400">Discover science fair models, academic research, engineering prototypes, and breakthrough experiments from students across Karnataka.</p>
           </div>
           <div className="glass-card p-8">
             <div className="w-14 h-14 mx-auto bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400 rounded-2xl flex items-center justify-center mb-6">
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
             </div>
-            <h3 className="font-display text-xl font-bold mb-3">AI, Tech & Coding</h3>
-            <p className="text-slate-600 dark:text-slate-400">Explore real-world software applications, robotics systems, and coding projects tackling modern problems.</p>
+            <h3 className="font-display text-xl font-bold mb-3">Technology & Creativity</h3>
+            <p className="text-slate-600 dark:text-slate-400">Explore coding projects, AI solutions, robotics systems, creative arts, and entrepreneurial ventures tackling real-world challenges.</p>
           </div>
           <div className="glass-card p-8">
             <div className="w-14 h-14 mx-auto bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-2xl flex items-center justify-center mb-6">
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
-            <h3 className="font-display text-xl font-bold mb-3">Agriculture & Environment</h3>
-            <p className="text-slate-600 dark:text-slate-400">Review innovations in smart agriculture, climate change mitigation, and environmental sustainability.</p>
+            <h3 className="font-display text-xl font-bold mb-3">Agriculture, Environment & Vocational Skills</h3>
+            <p className="text-slate-600 dark:text-slate-400">Review innovations in smart agriculture, environmental sustainability, vocational craftsmanship, and community leadership projects.</p>
           </div>
         </div>
       </section>
@@ -73,8 +73,8 @@ export default function LandingPage() {
         <section id="features" className="section-shell py-14">
           <SectionHeader
             eyebrow="Featured student projects"
-            title="Built for problem solvers, makers, and innovators"
-            description="Students present science models, AI solutions, engineering prototypes, and agricultural systems in a polished, institutional format."
+            title="Built by problem solvers, creators, and future leaders"
+            description="Students present research, creative works, vocational projects, entrepreneurial ideas, and practical innovations in a polished, institutional format."
           />
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             {featuredProjects.map((project) => (
@@ -85,9 +85,9 @@ export default function LandingPage() {
       )}
 
       <section className="section-shell py-20 border-t border-slate-200 dark:border-slate-800 text-center">
-        <h2 className="font-display text-4xl font-bold mb-6">Ready to showcase your research?</h2>
+        <h2 className="font-display text-4xl font-bold mb-6">Ready to showcase your skills & talent?</h2>
         <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto">
-          Contact your teacher or school administrator to get your verified student account and start uploading your STEM projects.
+          Contact your teacher or school administrator to get your verified student account and start uploading your projects — from science and coding to agriculture, arts, and beyond.
         </p>
         <Link to="/login" className="primary-button text-lg px-8 py-4 inline-flex items-center gap-2">
           Access Your Dashboard

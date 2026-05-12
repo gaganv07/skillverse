@@ -22,6 +22,8 @@ import certificateRoutes from "./routes/certificateRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import bookmarkRoutes from "./routes/bookmarkRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
 
 export const app = express();
 
@@ -78,6 +80,8 @@ app.use("/api/v1/certificates", certificateRoutes);
 app.use("/api/v1/messages", messageRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/uploads", uploadRoutes);
+app.use("/api/v1/bookmarks", bookmarkRoutes);
+app.use("/api/v1/profiles", profileRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

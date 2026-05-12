@@ -9,6 +9,9 @@ const schoolSchema = new mongoose.Schema(
     principalName: String,
     contactEmail: String,
     website: String,
+    logo: String,
+    banner: String,
+    description: String,
     stats: {
       students: { type: Number, default: 0 },
       verifiedStudents: { type: Number, default: 0 },

@@ -50,7 +50,8 @@ const projectSchema = new mongoose.Schema(
       shares: { type: Number, default: 0 }
     },
     tags: [String],
-    isBookmarkedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+    isBookmarkedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
   },
   { timestamps: true }
 );

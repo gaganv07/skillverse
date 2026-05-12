@@ -18,6 +18,7 @@ import AdminDashboardPage from "./pages/AdminDashboardPage";
 import SearchPage from "./pages/SearchPage";
 import MessagesPage from "./pages/MessagesPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import SchoolProfilePage from "./pages/SchoolProfilePage";
 
 export default function App() {
   return (
@@ -26,9 +27,11 @@ export default function App() {
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/projects/:id" element={<ProjectDetailsPage />} />
-        <Route path="/students/:id" element={<ProfilePage />} />
+        <Route path="/profile/:id" element={<ProfilePage />} />
+        <Route path="/school/:id" element={<SchoolProfilePage />} />
         <Route path="/leaderboards" element={<LeaderboardPage />} />
 
         {/* Protected Routes (Any authenticated user) */}

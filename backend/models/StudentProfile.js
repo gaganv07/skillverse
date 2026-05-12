@@ -8,6 +8,7 @@ const studentProfileSchema = new mongoose.Schema(
       required: true,
       unique: true
     },
+    banner: String,
     headline: String,
     classLevel: String,
     interests: [String],

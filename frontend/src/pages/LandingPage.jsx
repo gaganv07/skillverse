@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { SectionHeader } from "../components/ui/SectionHeader";
 import { ProjectCard } from "../components/ui/ProjectCard";
+import { KarnatakaFlag } from "../components/ui/KarnatakaFlag";
 import { api } from "../lib/api";
 
 export default function LandingPage() {
@@ -25,8 +26,11 @@ export default function LandingPage() {
               India's premier student innovation portal for government schools
             </span>
           </div>
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <KarnatakaFlag className="w-16 h-11 rounded-lg" />
+          </div>
           <h1 className="font-display text-5xl font-extrabold tracking-tight sm:text-7xl">
-            Empowering Students Through <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-cyan-500">Science & Innovation</span>
+            Empowering Karnataka's Students Through <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-yellow-500">Science & Innovation</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 dark:text-slate-300">
             A centralized platform showcasing student projects, research, and real-world skills. Explore innovations in technology, agriculture, engineering, and environmental sustainability.

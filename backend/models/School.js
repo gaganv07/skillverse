@@ -17,6 +17,14 @@ const schoolSchema = new mongoose.Schema(
       verifiedStudents: { type: Number, default: 0 },
       projects: { type: Number, default: 0 },
       awards: { type: Number, default: 0 }
+    },
+    isVerified: {
+      type: Boolean,
+      default: false
+    },
+    isActive: {
+      type: Boolean,
+      default: true
     }
   },
   { timestamps: true }

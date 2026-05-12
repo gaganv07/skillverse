@@ -3,236 +3,264 @@ import { PageHero } from "../components/ui/PageHero";
 import { api } from "../lib/api";
 
 export default function AdminDashboardPage() {
-  const [users, setUsers] = useState([]);
-  const [stats, setStats] = useState({ users: 0, projects: 0, competitions: 0 });
+  const [activeTab, setActiveTab] = useState("analytics");
   const [loading, setLoading] = useState(true);
   
-  // Search & Filter state
-  const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
-
-  // Create Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [createForm, setCreateForm] = useState({ fullName: "", email: "", password: "", role: "student" });
-  const [createError, setCreateError] = useState("");
+  // Data states
+  const [analytics, setAnalytics] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [verifications, setVerifications] = useState([]);
+  const [logs, setLogs] = useState([]);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData(activeTab);
+  }, [activeTab]);
 
-  const fetchData = async () => {
+  const fetchData = async (tab) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const [usersRes, statsRes] = await Promise.all([
-        api.get("/users"),
-        api.get("/admin/stats")
-      ]);
-      if (usersRes.data.success) setUsers(usersRes.data.users);
-      if (statsRes.data.success) setStats(statsRes.data.stats);
-    } catch (error) {
-      console.error(error);
+      if (tab === "analytics") {
+        const res = await api.get("/admin/analytics");
+        if (res.data?.success) setAnalytics(res.data.analytics);
+      } else if (tab === "users") {
+        const res = await api.get("/users");
+        if (res.data?.success) setUsers(res.data.users);
+      } else if (tab === "moderation") {
+        const res = await api.get("/admin/reports");
+        if (res.data?.success) setReports(res.data.reports);
+      } else if (tab === "verification") {
+        const res = await api.get("/admin/verifications");
+        if (res.data?.success) setVerifications(res.data.requests);
+      } else if (tab === "logs") {
+        const res = await api.get("/admin/logs");
+        if (res.data?.success) setLogs(res.data.logs);
+      }
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateUser = async (e) => {
-    e.preventDefault();
-    setCreateError("");
+  const handleModerateUser = async (id, isActive) => {
     try {
-      const res = await api.post("/auth/register", createForm);
-      if (res.data.success) {
-        setIsModalOpen(false);
-        setCreateForm({ fullName: "", email: "", password: "", role: "student" });
-        fetchData(); // refresh list
-      }
-    } catch (err) {
-      setCreateError(err.response?.data?.message || "Failed to create user");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
-    try {
-      await api.delete(`/users/${id}`);
-      setUsers(users.filter(u => u._id !== id));
+      await api.patch(`/admin/users/${id}/moderate`, { isActive: !isActive });
+      fetchData("users");
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleToggleStatus = async (id) => {
+  const handleResolveReport = async (id, status) => {
     try {
-      const res = await api.patch(`/users/${id}/status`);
-      if (res.data.success) {
-        setUsers(users.map(u => u._id === id ? { ...u, isActive: res.data.user.isActive } : u));
-      }
+      await api.patch(`/admin/reports/${id}/resolve`, { status, adminNotes: "Resolved from dashboard" });
+      fetchData("moderation");
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleVerify = async (id) => {
+  const handleProcessVerification = async (id, status) => {
     try {
-      const res = await api.patch(`/users/${id}/verify`);
-      if (res.data.success) {
-        setUsers(users.map(u => u._id === id ? { ...u, isVerified: res.data.user.isVerified } : u));
-      }
+      await api.patch(`/admin/verifications/${id}/process`, { status, adminNotes: "Processed from dashboard" });
+      fetchData("verification");
     } catch (err) {
       console.error(err);
     }
   };
-
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.fullName?.toLowerCase().includes(search.toLowerCase()) || user.email?.toLowerCase().includes(search.toLowerCase());
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
-    return matchesSearch && matchesRole;
-  });
 
   return (
     <div>
       <PageHero
-        badge="Admin command center"
-        title="Manage the ecosystem with analytics, moderation, and announcements"
-        description="Admins can oversee users, projects, competitions, certificates, moderation workflows, and featured content."
+        badge="Enterprise Command Center"
+        title="Admin Analytics & Moderation System"
+        description="Oversee platform health, moderate content, process verifications, and audit activity logs."
       />
       
-      <section className="section-shell grid gap-6 py-8 md:grid-cols-3">
-        {[
-          { label: "Users", value: stats.users },
-          { label: "Projects", value: stats.projects },
-          { label: "Competitions", value: stats.competitions }
-        ].map((stat) => (
-          <div key={stat.label} className="glass-card p-6">
-            <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
-            <p className="mt-3 font-display text-4xl font-bold">{stat.value}</p>
-          </div>
-        ))}
-      </section>
-
-      <section className="section-shell py-4">
-        <div className="glass-card overflow-hidden">
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700/50 flex flex-col sm:flex-row justify-between gap-4 items-center">
-            <h2 className="text-xl font-display font-semibold">User Management</h2>
-            <button onClick={() => setIsModalOpen(true)} className="primary-button text-sm px-4 py-2">
-              + Create User
-            </button>
-          </div>
-
-          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 flex gap-4 flex-wrap">
-            <input 
-              type="text" 
-              placeholder="Search by name or email..." 
-              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm flex-grow max-w-md"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <select 
-              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm"
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="flex flex-wrap gap-2 mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
+          {["analytics", "moderation", "verification", "users", "logs"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-lg font-medium capitalize transition-colors ${activeTab === tab ? 'bg-brand-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'}`}
             >
-              <option value="all">All Roles</option>
-              <option value="student">Students</option>
-              <option value="teacher">Teachers</option>
-              <option value="admin">Admins</option>
-            </select>
-          </div>
+              {tab}
+            </button>
+          ))}
+        </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-y border-slate-200 dark:border-slate-700">
-                <tr>
-                  <th className="px-6 py-4 font-medium">User Details</th>
-                  <th className="px-6 py-4 font-medium">Role</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
-                  <th className="px-6 py-4 font-medium">Verification</th>
-                  <th className="px-6 py-4 font-medium text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                {loading ? (
-                  <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">Loading users...</td></tr>
-                ) : filteredUsers.length === 0 ? (
-                  <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No users found.</td></tr>
-                ) : (
-                  filteredUsers.map(user => (
-                    <tr key={user._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-slate-900 dark:text-white">{user.fullName}</div>
-                        <div className="text-slate-500">{user.email}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="badge capitalize">{user.role}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <button 
-                          onClick={() => handleToggleStatus(user._id)}
-                          className={`px-3 py-1 rounded-full text-xs font-medium border ${user.isActive !== false ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800'}`}
-                        >
-                          {user.isActive !== false ? 'Active' : 'Disabled'}
-                        </button>
-                      </td>
-                      <td className="px-6 py-4">
-                        <button 
-                          onClick={() => handleVerify(user._id)}
-                          className={`px-3 py-1 rounded-full text-xs font-medium border ${user.isVerified ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' : 'bg-slate-100 text-slate-600 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'}`}
-                        >
-                          {user.isVerified ? 'Verified' : 'Unverified'}
-                        </button>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button onClick={() => handleDelete(user._id)} className="text-red-600 hover:underline text-sm font-medium">Delete</button>
-                      </td>
+        {loading ? (
+          <div className="py-20 text-center text-slate-500">Loading {activeTab} data...</div>
+        ) : (
+          <div className="space-y-6">
+            {activeTab === "analytics" && analytics && (
+              <>
+                <div className="grid gap-6 md:grid-cols-4">
+                  {[
+                    { label: "Total Students", value: analytics.overview.totalStudents },
+                    { label: "Total Schools", value: analytics.overview.totalSchools },
+                    { label: "Total Projects", value: analytics.overview.totalProjects },
+                    { label: "Competitions", value: analytics.overview.totalCompetitions },
+                    { label: "Verified Users", value: analytics.overview.verifiedUsers }
+                  ].map((stat, i) => (
+                    <div key={i} className="glass-card p-6 border-t-4 border-brand-500">
+                      <p className="text-sm font-semibold uppercase tracking-wider text-slate-500">{stat.label}</p>
+                      <p className="mt-2 font-display text-4xl font-bold">{stat.value}</p>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="glass-card p-6 mt-8">
+                  <h3 className="font-display text-xl font-bold mb-6">Trending Technologies & Categories</h3>
+                  <div className="flex flex-wrap gap-4">
+                    {analytics.categories?.map((cat, i) => (
+                      <div key={i} className="bg-slate-100 dark:bg-slate-800 px-4 py-3 rounded-xl flex items-center justify-between min-w-[200px]">
+                        <span className="font-medium capitalize">{cat._id}</span>
+                        <span className="badge">{cat.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "users" && (
+              <div className="glass-card overflow-x-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-slate-100 dark:bg-slate-800 text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                      <th className="px-6 py-4 font-medium">User</th>
+                      <th className="px-6 py-4 font-medium">Role</th>
+                      <th className="px-6 py-4 font-medium">Status</th>
+                      <th className="px-6 py-4 font-medium text-right">Actions</th>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                    {users.map(u => (
+                      <tr key={u._id}>
+                        <td className="px-6 py-4">
+                          <div className="font-medium">{u.fullName}</div>
+                          <div className="text-slate-500">{u.email}</div>
+                        </td>
+                        <td className="px-6 py-4 capitalize"><span className="badge">{u.role}</span></td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${u.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {u.isActive ? 'Active' : 'Disabled'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button onClick={() => handleModerateUser(u._id, u.isActive)} className="text-sm font-medium text-brand-600 hover:underline">
+                            {u.isActive ? 'Disable' : 'Activate'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
-      {/* Create User Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-slate-800">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-              <h3 className="text-lg font-bold">Create New User</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
-            </div>
-            <form onSubmit={handleCreateUser} className="p-6 space-y-4">
-              {createError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm">{createError}</div>}
-              
-              <div>
-                <label className="block text-sm font-medium mb-1">Full Name</label>
-                <input required className="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent" value={createForm.fullName} onChange={e => setCreateForm({...createForm, fullName: e.target.value})} />
+            {activeTab === "moderation" && (
+              <div className="glass-card overflow-x-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-slate-100 dark:bg-slate-800 text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                      <th className="px-6 py-4 font-medium">Target</th>
+                      <th className="px-6 py-4 font-medium">Reason</th>
+                      <th className="px-6 py-4 font-medium">Status</th>
+                      <th className="px-6 py-4 font-medium text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                    {reports.map(r => (
+                      <tr key={r._id}>
+                        <td className="px-6 py-4 capitalize font-medium">{r.targetType}</td>
+                        <td className="px-6 py-4">
+                          <div className="capitalize text-red-600 font-medium">{r.reason}</div>
+                          <div className="text-slate-500 truncate max-w-xs">{r.description}</div>
+                        </td>
+                        <td className="px-6 py-4 capitalize">
+                           <span className={`badge ${r.status === 'resolved' ? 'bg-green-100' : 'bg-amber-100'}`}>{r.status}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right flex justify-end gap-3">
+                          {r.status === "pending" && (
+                            <>
+                              <button onClick={() => handleResolveReport(r._id, "resolved")} className="text-green-600 font-medium hover:underline">Resolve</button>
+                              <button onClick={() => handleResolveReport(r._id, "dismissed")} className="text-slate-500 font-medium hover:underline">Dismiss</button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
-                <input required type="email" className="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent" value={createForm.email} onChange={e => setCreateForm({...createForm, email: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Temporary Password</label>
-                <input required minLength="6" type="password" className="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent" value={createForm.password} onChange={e => setCreateForm({...createForm, password: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Role</label>
-                <select className="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent" value={createForm.role} onChange={e => setCreateForm({...createForm, role: e.target.value})}>
-                  <option value="student">Student</option>
-                  <option value="teacher">Teacher</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
+            )}
 
-              <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-2 px-4 rounded-xl border border-slate-300 font-medium">Cancel</button>
-                <button type="submit" className="flex-1 primary-button">Create User</button>
+            {activeTab === "verification" && (
+              <div className="glass-card overflow-x-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-slate-100 dark:bg-slate-800 text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                      <th className="px-6 py-4 font-medium">Requested By</th>
+                      <th className="px-6 py-4 font-medium">Target Type</th>
+                      <th className="px-6 py-4 font-medium">Status</th>
+                      <th className="px-6 py-4 font-medium text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                    {verifications.map(v => (
+                      <tr key={v._id}>
+                        <td className="px-6 py-4 font-medium">{v.requestedBy?.fullName}</td>
+                        <td className="px-6 py-4 capitalize">{v.targetType}</td>
+                        <td className="px-6 py-4 capitalize">
+                          <span className={`badge ${v.status === 'approved' ? 'bg-green-100' : v.status === 'rejected' ? 'bg-red-100' : 'bg-amber-100'}`}>{v.status}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right flex justify-end gap-3">
+                          {v.status === "pending" && (
+                            <>
+                              <button onClick={() => handleProcessVerification(v._id, "approved")} className="text-green-600 font-medium hover:underline">Approve</button>
+                              <button onClick={() => handleProcessVerification(v._id, "rejected")} className="text-red-600 font-medium hover:underline">Reject</button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </form>
+            )}
+
+            {activeTab === "logs" && (
+              <div className="glass-card overflow-x-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-slate-100 dark:bg-slate-800 text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                      <th className="px-6 py-4 font-medium">Timestamp</th>
+                      <th className="px-6 py-4 font-medium">Admin</th>
+                      <th className="px-6 py-4 font-medium">Action</th>
+                      <th className="px-6 py-4 font-medium">Target</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                    {logs.map(log => (
+                      <tr key={log._id}>
+                        <td className="px-6 py-4 text-slate-500">{new Date(log.createdAt).toLocaleString()}</td>
+                        <td className="px-6 py-4 font-medium">{log.admin?.fullName}</td>
+                        <td className="px-6 py-4 font-mono text-xs">{log.action}</td>
+                        <td className="px-6 py-4 capitalize text-slate-500">{log.targetModel}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

@@ -132,7 +132,29 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          <h1 className="mt-6 font-display text-4xl font-bold">{project.title}</h1>
+          <div className="mt-6 flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <h1 className="font-display text-4xl font-bold">{project.title}</h1>
+              {project.isVerified && (
+                <svg className="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              )}
+            </div>
+            {user && !isOwner && (
+              <button 
+                onClick={() => {
+                  const reason = prompt("Reason for reporting (fake, inappropriate, spam, abuse):", "inappropriate");
+                  if (reason) {
+                    api.post("/reports", { targetType: "project", targetId: project._id, reason, description: "Reported from project page" })
+                      .then(() => alert("Project reported."))
+                      .catch(err => alert("Failed to report project."));
+                  }
+                }}
+                className="text-xs font-bold text-slate-400 hover:text-red-600 uppercase tracking-wider transition-colors"
+              >
+                Flag Project
+              </button>
+            )}
+          </div>
           
           <div className="mt-4 flex flex-wrap items-center gap-4 text-slate-600 dark:text-slate-300">
             <Link to={`/profile/${project.student?._id}`} className="flex items-center gap-2 hover:text-primary-600 transition-colors">

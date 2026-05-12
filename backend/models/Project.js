@@ -40,7 +40,7 @@ const projectSchema = new mongoose.Schema(
     demoLink: String,
     status: {
       type: String,
-      enum: ["draft", "pending", "approved", "featured", "rejected"],
+      enum: ["draft", "pending", "approved", "featured", "rejected", "disabled"],
       default: "pending"
     },
     metrics: {
@@ -51,7 +51,11 @@ const projectSchema = new mongoose.Schema(
     },
     tags: [String],
     isBookmarkedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+    likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    isVerified: {
+      type: Boolean,
+      default: false
+    }
   },
   { timestamps: true }
 );

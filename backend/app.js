@@ -26,6 +26,8 @@ import bookmarkRoutes from "./routes/bookmarkRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
 import submissionRoutes from "./routes/submissionRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
+import verificationRoutes from "./routes/verificationRoutes.js";
 
 export const app = express();
 
@@ -86,6 +88,8 @@ app.use("/api/v1/bookmarks", bookmarkRoutes);
 app.use("/api/v1/profiles", profileRoutes);
 app.use("/api/v1/registrations", registrationRoutes);
 app.use("/api/v1/submissions", submissionRoutes);
+app.use("/api/v1/reports", reportRoutes);
+app.use("/api/v1/verifications", verificationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

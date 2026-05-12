@@ -58,7 +58,12 @@ export default function ProfilePage() {
               )}
             </div>
             
-            <h2 className="mt-6 font-display text-3xl font-bold">{user.fullName}</h2>
+            <div className="mt-6 flex items-center gap-2">
+              <h2 className="font-display text-3xl font-bold">{user.fullName}</h2>
+              {user.isVerified && (
+                <svg className="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              )}
+            </div>
             {profile?.headline && <p className="text-lg font-medium text-slate-700 dark:text-slate-200 mt-1">{profile.headline}</p>}
             
             <div className="mt-4 space-y-2">
@@ -100,6 +105,22 @@ export default function ProfilePage() {
                 </div>
               </div>
             )}
+            
+            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+              <button 
+                onClick={() => {
+                  const reason = prompt("Reason for reporting (fake, inappropriate, spam, abuse):", "spam");
+                  if (reason) {
+                    api.post("/reports", { targetType: "user", targetId: user._id, reason, description: "Reported from profile" })
+                      .then(() => alert("User reported."))
+                      .catch(err => alert("Failed to report user."));
+                  }
+                }}
+                className="text-xs font-semibold text-slate-400 hover:text-red-500 transition-colors uppercase tracking-wider"
+              >
+                Flag / Report User
+              </button>
+            </div>
           </aside>
 
           {/* Main Content */}

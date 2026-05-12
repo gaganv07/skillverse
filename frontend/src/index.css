@@ -44,15 +44,23 @@
     @apply inline-flex items-center justify-center rounded-full border border-slate-300/60 bg-white/60 px-5 py-3 font-semibold text-slate-800 transition hover:bg-white dark:border-slate-700 dark:bg-slate-900/60 dark:text-white dark:hover:bg-slate-900;
   }
 }
-@keyframes wave {
-  0% { transform: scaleY(1) skewY(0deg) skewX(0deg); }
-  25% { transform: scaleY(0.98) skewY(2deg) skewX(-1deg); }
-  50% { transform: scaleY(1) skewY(0deg) skewX(0deg); }
-  75% { transform: scaleY(0.98) skewY(-2deg) skewX(1deg); }
-  100% { transform: scaleY(1) skewY(0deg) skewX(0deg); }
+@keyframes cloth-wave {
+  0% { transform: rotateY(0deg) rotateX(0deg) translateZ(0px) skewY(0deg); }
+  33% { transform: rotateY(4deg) rotateX(2deg) translateZ(20px) skewY(1deg); }
+  66% { transform: rotateY(-2deg) rotateX(-1deg) translateZ(-10px) skewY(-1deg); }
+  100% { transform: rotateY(0deg) rotateX(0deg) translateZ(0px) skewY(0deg); }
 }
 
-.animate-wave {
-  animation: wave 3s ease-in-out infinite;
-  transform-origin: center left;
+@keyframes cloth-wind {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-cloth-wave {
+  animation: cloth-wave 12s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+.animate-cloth-wind {
+  animation: cloth-wind 8s linear infinite;
 }

@@ -2,7 +2,6 @@ import { Link, NavLink } from "react-router-dom";
 import { useTheme } from "../../providers/ThemeProvider";
 import { useLanguage } from "../../providers/LanguageProvider";
 import { useAuth } from "../../providers/AuthProvider";
-import { KarnatakaFlag } from "../ui/KarnatakaFlag";
 
 const links = [
   { to: "/projects", label: "Projects" },
@@ -21,7 +20,6 @@ export function Navbar() {
       <div className="section-shell py-4">
         <div className="glass-card flex items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-brand-700 dark:text-brand-200">
-            <KarnatakaFlag className="w-10 h-7 rounded-md" />
             <img src="/skillverse-logo.png" alt="SkillVerse Logo" className="h-8 w-8 object-cover rounded-md" />
             SkillVerse
           </Link>

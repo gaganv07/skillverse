@@ -26,9 +26,6 @@ export default function LandingPage() {
               India's premier student innovation portal for government schools
             </span>
           </div>
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <KarnatakaFlag className="w-16 h-11 rounded-lg" />
-          </div>
           <h1 className="font-display text-5xl font-extrabold tracking-tight sm:text-7xl">
             Empowering Karnataka's Students Through <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-yellow-500">Science & Innovation</span>
           </h1>
@@ -43,6 +40,7 @@ export default function LandingPage() {
         
         {/* Background decorative elements */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-500/10 dark:bg-brand-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+        <KarnatakaFlag className="inset-0" />
       </section>
 
       <section className="section-shell py-20 border-t border-slate-200 dark:border-slate-800">

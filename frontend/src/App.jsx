@@ -12,6 +12,8 @@ import MyProjectsPage from "./pages/MyProjectsPage";
 import EditProjectPage from "./pages/EditProjectPage";
 import ProfilePage from "./pages/ProfilePage";
 import CompetitionsPage from "./pages/CompetitionsPage";
+import CompetitionDetailsPage from "./pages/CompetitionDetailsPage";
+import CertificatesPage from "./pages/CertificatesPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import TeacherDashboardPage from "./pages/TeacherDashboardPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
@@ -33,6 +35,8 @@ export default function App() {
         <Route path="/profile/:id" element={<ProfilePage />} />
         <Route path="/school/:id" element={<SchoolProfilePage />} />
         <Route path="/leaderboards" element={<LeaderboardPage />} />
+        <Route path="/competitions" element={<CompetitionsPage />} />
+        <Route path="/competitions/:id" element={<CompetitionDetailsPage />} />
 
         {/* Protected Routes (Any authenticated user) */}
         <Route element={<ProtectedRoute />}>
@@ -41,6 +45,7 @@ export default function App() {
           <Route path="/my-projects" element={<MyProjectsPage />} />
           <Route path="/feed" element={<FeedPage />} />
           <Route path="/competitions" element={<CompetitionsPage />} />
+          <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/messages" element={<MessagesPage />} />
         </Route>

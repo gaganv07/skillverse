@@ -20,25 +20,11 @@ const competitionSchema = new mongoose.Schema(
     eligibility: [String],
     prizes: [String],
     rules: [String],
-    registrations: [
-      {
-        student: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        project: { type: mongoose.Schema.Types.ObjectId, ref: "Project" },
-        submittedAt: Date,
-        status: {
-          type: String,
-          enum: ["registered", "shortlisted", "winner", "rejected"],
-          default: "registered"
-        }
-      }
-    ],
-    winners: [
-      {
-        student: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        rank: String,
-        title: String
-      }
-    ],
+    status: {
+      type: String,
+      enum: ["upcoming", "registration-open", "ongoing", "completed"],
+      default: "upcoming"
+    },
     isPublished: {
       type: Boolean,
       default: true

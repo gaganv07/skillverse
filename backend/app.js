@@ -24,6 +24,8 @@ import adminRoutes from "./routes/adminRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import bookmarkRoutes from "./routes/bookmarkRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import registrationRoutes from "./routes/registrationRoutes.js";
+import submissionRoutes from "./routes/submissionRoutes.js";
 
 export const app = express();
 
@@ -82,6 +84,8 @@ app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/uploads", uploadRoutes);
 app.use("/api/v1/bookmarks", bookmarkRoutes);
 app.use("/api/v1/profiles", profileRoutes);
+app.use("/api/v1/registrations", registrationRoutes);
+app.use("/api/v1/submissions", submissionRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

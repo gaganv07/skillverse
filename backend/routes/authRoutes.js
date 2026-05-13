@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { forgotPassword, login, me, register, resetPassword, verifyEmail } from "../controllers/authController.js";
+import { debugLogin, forgotPassword, login, me, register, resetPassword, verifyEmail } from "../controllers/authController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = Router();
@@ -12,5 +12,8 @@ router.get("/me", protect, me);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 router.get("/verify-email/:token", verifyEmail);
+
+// Debug endpoint — remove in production
+router.post("/debug-login", debugLogin);
 
 export default router;

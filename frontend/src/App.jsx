@@ -44,6 +44,7 @@ export default function App() {
           <Route path="/projects/:id/edit" element={<EditProjectPage />} />
           <Route path="/my-projects" element={<MyProjectsPage />} />
           <Route path="/feed" element={<FeedPage />} />
+          <Route path="/dashboard" element={<FeedPage />} />
           <Route path="/competitions" element={<CompetitionsPage />} />
           <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/search" element={<SearchPage />} />

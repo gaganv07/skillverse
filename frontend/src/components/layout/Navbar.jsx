@@ -1,19 +1,34 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "../../providers/ThemeProvider";
 import { useLanguage } from "../../providers/LanguageProvider";
-import { useAuth } from "../../providers/AuthProvider";
+import { useAuth, getRoleRedirect } from "../../providers/AuthProvider";
 
-const links = [
+const publicLinks = [
   { to: "/projects", label: "Projects" },
-  { to: "/feed", label: "Community" },
   { to: "/competitions", label: "Events" },
   { to: "/leaderboards", label: "Leaderboards" }
 ];
+
+function getDashboardLink(role) {
+  if (role === "admin") return { to: "/admin-dashboard", label: "Dashboard" };
+  if (role === "teacher") return { to: "/teacher-dashboard", label: "Dashboard" };
+  return { to: "/feed", label: "Community" };
+}
 
 export function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
+  };
+
+  const navLinks = user
+    ? [...publicLinks, getDashboardLink(user.role)]
+    : publicLinks;
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
@@ -24,7 +39,7 @@ export function Navbar() {
             SkillVerse
           </Link>
           <nav className="hidden items-center gap-6 lg:flex">
-            {links.map((link) => (
+            {navLinks.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
@@ -48,9 +63,14 @@ export function Navbar() {
               {theme === "dark" ? "Light" : "Dark"}
             </button>
             {user ? (
-              <button onClick={logout} className="primary-button px-4 py-2 text-sm">
-                Logout
-              </button>
+              <div className="flex items-center gap-2">
+                <span className="hidden text-xs font-medium text-slate-500 dark:text-slate-400 sm:inline-block">
+                  {user.fullName}
+                </span>
+                <button onClick={handleLogout} className="primary-button px-4 py-2 text-sm">
+                  Logout
+                </button>
+              </div>
             ) : (
               <Link to="/login" className="primary-button px-4 py-2 text-sm">
                 Login

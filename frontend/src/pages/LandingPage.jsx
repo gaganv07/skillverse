@@ -19,40 +19,40 @@ export default function LandingPage() {
 
   return (
     <div className="pb-16">
-      <section className="relative overflow-hidden py-20 sm:py-32">
+      <section className="relative overflow-hidden py-12 sm:py-20 md:py-32">
         <div className="section-shell relative z-10 text-center">
-          <div className="mb-8 flex justify-center">
-            <span className="badge border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-800 dark:bg-brand-900/30 dark:text-brand-300">
+          <div className="mb-4 sm:mb-8 flex justify-center">
+            <span className="badge border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-800 dark:bg-brand-900/30 dark:text-brand-300 text-center leading-snug">
               Karnataka's unified student skill & innovation ecosystem
             </span>
           </div>
-          <h1 className="font-display text-5xl font-extrabold tracking-tight sm:text-7xl">
+          <h1 className="font-display text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-tight">
             Empowering Karnataka's Students Through <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-yellow-500">Skills, Innovation & Real-World Learning</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 dark:text-slate-300">
+          <p className="mx-auto mt-4 sm:mt-6 max-w-2xl text-sm sm:text-lg text-slate-600 dark:text-slate-300 px-2">
             A centralized platform where students showcase projects across science, technology, agriculture, arts, entrepreneurship, vocational skills, and real-world problem solving — powered by government schools across Karnataka.
           </p>
-          <div className="mt-10 flex justify-center gap-4">
-            <Link to="/projects" className="primary-button text-lg px-8 py-4">Explore Projects</Link>
-            <Link to="/login" className="secondary-button text-lg px-8 py-4">Student Login</Link>
+          <div className="mt-6 sm:mt-10 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4 sm:px-0">
+            <Link to="/projects" className="primary-button text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4">Explore Projects</Link>
+            <Link to="/login" className="secondary-button text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4">Student Login</Link>
           </div>
         </div>
         
         {/* Background decorative elements */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-500/10 dark:bg-brand-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[800px] h-[400px] sm:h-[800px] bg-brand-500/10 dark:bg-brand-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
         <KarnatakaFlag className="inset-0" />
       </section>
 
-      <section className="section-shell py-20 border-t border-slate-200 dark:border-slate-800">
-        <div className="grid gap-8 md:grid-cols-3 text-center">
-          <div className="glass-card p-8">
-            <div className="w-14 h-14 mx-auto bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 rounded-2xl flex items-center justify-center mb-6">
+      <section className="section-shell py-10 sm:py-20 border-t border-slate-200 dark:border-slate-800">
+        <div className="grid gap-4 sm:gap-8 md:grid-cols-3 text-center">
+          <div className="glass-card p-5 sm:p-8">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
             </div>
             <h3 className="font-display text-xl font-bold mb-3">Science & Research</h3>
             <p className="text-slate-600 dark:text-slate-400">Discover science fair models, academic research, engineering prototypes, and breakthrough experiments from students across Karnataka.</p>
           </div>
-          <div className="glass-card p-8">
+          <div className="glass-card p-5 sm:p-8">
             <div className="w-14 h-14 mx-auto bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400 rounded-2xl flex items-center justify-center mb-6">
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
             </div>
@@ -76,7 +76,7 @@ export default function LandingPage() {
             title="Built by problem solvers, creators, and future leaders"
             description="Students present research, creative works, vocational projects, entrepreneurial ideas, and practical innovations in a polished, institutional format."
           />
-          <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          <div className="mt-6 sm:mt-10 grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featuredProjects.map((project) => (
               <ProjectCard key={project._id} project={project} />
             ))}
@@ -84,12 +84,12 @@ export default function LandingPage() {
         </section>
       )}
 
-      <section className="section-shell py-20 border-t border-slate-200 dark:border-slate-800 text-center">
-        <h2 className="font-display text-4xl font-bold mb-6">Ready to showcase your skills & talent?</h2>
-        <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto">
+      <section className="section-shell py-10 sm:py-20 border-t border-slate-200 dark:border-slate-800 text-center">
+        <h2 className="font-display text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 px-2">Ready to showcase your skills & talent?</h2>
+        <p className="text-base sm:text-xl text-slate-600 dark:text-slate-400 mb-6 sm:mb-10 max-w-2xl mx-auto px-4">
           Contact your teacher or school administrator to get your verified student account and start uploading your projects — from science and coding to agriculture, arts, and beyond.
         </p>
-        <Link to="/login" className="primary-button text-lg px-8 py-4 inline-flex items-center gap-2">
+        <Link to="/login" className="primary-button text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 inline-flex items-center gap-2">
           Access Your Dashboard
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
         </Link>

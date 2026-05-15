@@ -101,7 +101,7 @@ export default function UserManagementPanel() {
       )}
 
       {/* Toolbar */}
-      <div className="glass-card p-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="glass-card p-3 sm:p-4 flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 flex-wrap gap-3 items-center">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -138,7 +138,7 @@ export default function UserManagementPanel() {
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50">
               <tr>
-                <th className="px-6 py-3.5 font-semibold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">User</th>
+                <th className="px-3 sm:px-6 py-3.5 font-semibold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">User</th>
                 <th className="px-6 py-3.5 font-semibold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">Role</th>
                 <th className="px-6 py-3.5 font-semibold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider hidden md:table-cell">School</th>
                 <th className="px-6 py-3.5 font-semibold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">Status</th>
@@ -211,7 +211,7 @@ export default function UserManagementPanel() {
 
         {/* Pagination */}
         {pagination.pages > 1 && (
-          <div className="flex items-center justify-between border-t border-slate-200/50 dark:border-slate-700/50 px-6 py-3">
+          <div className="flex items-center justify-between border-t border-slate-200/50 dark:border-slate-700/50 px-3 sm:px-6 py-3">
             <button onClick={()=>fetchUsers(pagination.page-1)} disabled={pagination.page<=1} className="secondary-button px-4 py-2 text-xs disabled:opacity-40">Previous</button>
             <span className="text-xs text-slate-500">Page {pagination.page} of {pagination.pages}</span>
             <button onClick={()=>fetchUsers(pagination.page+1)} disabled={pagination.page>=pagination.pages} className="secondary-button px-4 py-2 text-xs disabled:opacity-40">Next</button>

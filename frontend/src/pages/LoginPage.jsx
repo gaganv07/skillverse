@@ -119,7 +119,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:py-12">
       {/* Decorative background elements */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-20 w-72 h-72 bg-brand-400/10 rounded-full blur-3xl animate-pulse" />
@@ -128,16 +128,16 @@ export default function LoginPage() {
       </div>
 
       {/* Logo */}
-      <div className="mb-8 flex flex-col items-center">
+      <div className="mb-5 sm:mb-8 flex flex-col items-center">
         <div className="relative mb-4">
           <div className="absolute -inset-2 rounded-2xl bg-gradient-to-br from-brand-400/30 to-indigo-400/30 blur-lg" />
           <img
             src="/skillverse-logo.png"
             alt="SkillVerse Logo"
-            className="relative w-20 h-20 object-cover rounded-2xl shadow-xl border-2 border-white/50 dark:border-slate-700/50"
+            className="relative w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-2xl shadow-xl border-2 border-white/50 dark:border-slate-700/50"
           />
         </div>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+        <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
           Welcome Back
         </h1>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 text-center max-w-sm">
@@ -147,7 +147,7 @@ export default function LoginPage() {
 
       {/* Login Card */}
       <div className="w-full max-w-md">
-        <div className="glass-card p-8 sm:p-10">
+        <div className="glass-card p-5 sm:p-8 md:p-10">
           {/* Error Alert */}
           {localError && (
             <div

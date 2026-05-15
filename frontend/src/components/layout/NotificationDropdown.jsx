@@ -93,15 +93,20 @@ export default function NotificationDropdown() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 z-[80] w-[360px] max-h-[480px] overflow-hidden rounded-2xl border border-slate-200/60 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-900/95">
-          <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-700/50 px-4 py-3">
+        <div className="fixed inset-0 sm:absolute sm:inset-auto sm:right-0 sm:top-12 z-[80] sm:w-[360px] sm:max-h-[480px] overflow-hidden sm:rounded-2xl border-0 sm:border border-slate-200/60 bg-white/98 sm:bg-white/95 shadow-2xl backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-900/98 sm:dark:bg-slate-900/95">
+          <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-700/50 px-4 py-3 pt-14 sm:pt-3">
             <h3 className="font-display text-sm font-bold">Notifications</h3>
-            {unreadCount > 0 && (
-              <button onClick={handleMarkAllRead} className="text-xs font-medium text-brand-600 hover:underline">Mark all read</button>
-            )}
+            <div className="flex items-center gap-3">
+              {unreadCount > 0 && (
+                <button onClick={handleMarkAllRead} className="text-xs font-medium text-brand-600 hover:underline">Mark all read</button>
+              )}
+              <button onClick={() => setOpen(false)} className="sm:hidden rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
           </div>
 
-          <div className="max-h-[380px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/50">
+          <div className="max-h-[calc(100vh-140px)] sm:max-h-[380px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/50">
             {loading ? (
               <div className="px-4 py-8 text-center text-sm text-slate-400">Loading...</div>
             ) : notifications.length === 0 ? (

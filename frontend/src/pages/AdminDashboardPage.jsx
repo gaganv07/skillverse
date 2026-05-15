@@ -81,21 +81,21 @@ export default function AdminDashboardPage() {
         description="Manage users, moderate content, process verifications, and monitor platform activity."
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-8">
         {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div className="flex gap-2 mb-4 sm:mb-8 border-b border-slate-200 dark:border-slate-800 pb-3 sm:pb-4 overflow-x-auto -mx-1 px-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm whitespace-nowrap transition-all ${
                 activeTab === tab.id
                   ? "bg-brand-600 text-white shadow-md shadow-brand-500/20"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d={tab.icon}/></svg>
-              {tab.label}
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="w-4 h-4 shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d={tab.icon}/></svg>
+              <span className="hidden xs:inline sm:inline">{tab.label}</span>
             </button>
           ))}
         </div>
@@ -112,7 +112,7 @@ export default function AdminDashboardPage() {
           <div className="space-y-6">
             {activeTab === "analytics" && analytics && (
               <>
-                <div className="grid gap-6 md:grid-cols-4">
+                <div className="grid gap-3 sm:gap-6 grid-cols-2 md:grid-cols-4">
                   {[
                     { label: "Total Students", value: analytics.overview.totalStudents, color: "border-emerald-500" },
                     { label: "Total Schools", value: analytics.overview.totalSchools, color: "border-blue-500" },
@@ -120,17 +120,17 @@ export default function AdminDashboardPage() {
                     { label: "Competitions", value: analytics.overview.totalCompetitions, color: "border-amber-500" },
                     { label: "Verified Users", value: analytics.overview.verifiedUsers, color: "border-brand-500" }
                   ].map((stat, i) => (
-                    <div key={i} className={`glass-card p-6 border-t-4 ${stat.color}`}>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{stat.label}</p>
-                      <p className="mt-2 font-display text-4xl font-bold">{stat.value}</p>
+                    <div key={i} className={`glass-card p-4 sm:p-6 border-t-4 ${stat.color}`}>
+                      <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">{stat.label}</p>
+                      <p className="mt-1 sm:mt-2 font-display text-2xl sm:text-4xl font-bold">{stat.value}</p>
                     </div>
                   ))}
                 </div>
-                <div className="glass-card p-6 mt-8">
-                  <h3 className="font-display text-xl font-bold mb-6">Trending Technologies & Categories</h3>
-                  <div className="flex flex-wrap gap-4">
+                <div className="glass-card p-4 sm:p-6 mt-4 sm:mt-8">
+                  <h3 className="font-display text-lg sm:text-xl font-bold mb-4 sm:mb-6">Trending Technologies & Categories</h3>
+                  <div className="flex flex-wrap gap-2 sm:gap-4">
                     {analytics.categories?.map((cat, i) => (
-                      <div key={i} className="bg-slate-100 dark:bg-slate-800 px-4 py-3 rounded-xl flex items-center justify-between min-w-[200px]">
+                      <div key={i} className="bg-slate-100 dark:bg-slate-800 px-3 sm:px-4 py-2 sm:py-3 rounded-xl flex items-center justify-between min-w-[140px] sm:min-w-[200px]">
                         <span className="font-medium capitalize">{cat._id}</span>
                         <span className="badge">{cat.count}</span>
                       </div>
@@ -141,7 +141,8 @@ export default function AdminDashboardPage() {
             )}
 
             {activeTab === "moderation" && (
-              <div className="glass-card overflow-x-auto">
+              <div className="glass-card overflow-hidden">
+                <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm whitespace-nowrap">
                   <thead className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50">
                     <tr>
@@ -176,18 +177,20 @@ export default function AdminDashboardPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             )}
 
             {activeTab === "verification" && (
-              <div className="glass-card overflow-x-auto">
+              <div className="glass-card overflow-hidden">
+                <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm whitespace-nowrap">
                   <thead className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50">
                     <tr>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Requested By</th>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Target Type</th>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider text-right">Actions</th>
+                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Requested By</th>
+                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Target Type</th>
+                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Status</th>
+                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -195,12 +198,12 @@ export default function AdminDashboardPage() {
                       <tr><td colSpan="4" className="px-6 py-12 text-center text-slate-400">No verification requests</td></tr>
                     ) : verifications.map(v => (
                       <tr key={v._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                        <td className="px-6 py-4 font-medium">{v.requestedBy?.fullName}</td>
-                        <td className="px-6 py-4 capitalize">{v.targetType}</td>
-                        <td className="px-6 py-4 capitalize">
+                        <td className="px-4 sm:px-6 py-4 font-medium">{v.requestedBy?.fullName}</td>
+                        <td className="px-4 sm:px-6 py-4 capitalize">{v.targetType}</td>
+                        <td className="px-4 sm:px-6 py-4 capitalize">
                           <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${v.status === "approved" ? "bg-green-100 text-green-700" : v.status === "rejected" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>{v.status}</span>
                         </td>
-                        <td className="px-6 py-4 text-right flex justify-end gap-3">
+                        <td className="px-4 sm:px-6 py-4 text-right flex justify-end gap-3">
                           {v.status === "pending" && (
                             <>
                               <button onClick={() => handleProcessVerification(v._id, "approved")} className="text-green-600 font-medium hover:underline text-sm">Approve</button>
@@ -212,18 +215,20 @@ export default function AdminDashboardPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             )}
 
             {activeTab === "logs" && (
-              <div className="glass-card overflow-x-auto">
+              <div className="glass-card overflow-hidden">
+                <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm whitespace-nowrap">
                   <thead className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50">
                     <tr>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Timestamp</th>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Admin</th>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Action</th>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Target</th>
+                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Timestamp</th>
+                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Admin</th>
+                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Action</th>
+                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Target</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -231,14 +236,15 @@ export default function AdminDashboardPage() {
                       <tr><td colSpan="4" className="px-6 py-12 text-center text-slate-400">No activity logs yet</td></tr>
                     ) : logs.map(log => (
                       <tr key={log._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                        <td className="px-6 py-4 text-slate-500 text-xs">{new Date(log.createdAt).toLocaleString()}</td>
-                        <td className="px-6 py-4 font-medium">{log.admin?.fullName}</td>
-                        <td className="px-6 py-4 font-mono text-xs">{log.action}</td>
-                        <td className="px-6 py-4 capitalize text-slate-500">{log.targetModel}</td>
+                        <td className="px-4 sm:px-6 py-4 text-slate-500 text-xs">{new Date(log.createdAt).toLocaleString()}</td>
+                        <td className="px-4 sm:px-6 py-4 font-medium">{log.admin?.fullName}</td>
+                        <td className="px-4 sm:px-6 py-4 font-mono text-xs">{log.action}</td>
+                        <td className="px-4 sm:px-6 py-4 capitalize text-slate-500">{log.targetModel}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             )}
           </div>

@@ -7,43 +7,74 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     @apply bg-slate-50 font-body text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
     background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.94), rgba(232, 244, 255, 0.8));
+    overflow-x: hidden;
   }
 
   .dark body {
     background-image: linear-gradient(to bottom right, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.95));
   }
+
+  /* Prevent zoom on iOS inputs */
+  @media (max-width: 767px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="url"],
+    input[type="search"],
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
 }
 
 @layer components {
   .glass-card {
-    @apply rounded-3xl border border-white/20 bg-white/60 shadow-2xl shadow-slate-200/40 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/55 dark:shadow-black/20;
+    @apply rounded-2xl sm:rounded-3xl border border-white/20 bg-white/60 shadow-xl sm:shadow-2xl shadow-slate-200/40 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/55 dark:shadow-black/20;
   }
 
   .section-shell {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8;
   }
 
   .section-title {
-    @apply font-display text-3xl font-bold tracking-tight sm:text-4xl;
+    @apply font-display text-2xl sm:text-3xl font-bold tracking-tight md:text-4xl;
   }
 
   .badge {
-    @apply inline-flex items-center rounded-full border border-brand-300/40 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:border-brand-400/20 dark:bg-brand-500/10 dark:text-brand-200;
+    @apply inline-flex items-center rounded-full border border-brand-300/40 bg-brand-50 px-2.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-brand-700 dark:border-brand-400/20 dark:bg-brand-500/10 dark:text-brand-200;
   }
 
   .primary-button {
-    @apply inline-flex items-center justify-center rounded-full bg-brand-500 px-5 py-3 font-semibold text-white shadow-glow transition hover:bg-brand-600;
+    @apply inline-flex items-center justify-center rounded-full bg-brand-500 px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white shadow-glow transition active:scale-[0.97] hover:bg-brand-600;
   }
 
   .secondary-button {
-    @apply inline-flex items-center justify-center rounded-full border border-slate-300/60 bg-white/60 px-5 py-3 font-semibold text-slate-800 transition hover:bg-white dark:border-slate-700 dark:bg-slate-900/60 dark:text-white dark:hover:bg-slate-900;
+    @apply inline-flex items-center justify-center rounded-full border border-slate-300/60 bg-white/60 px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-slate-800 transition active:scale-[0.97] hover:bg-white dark:border-slate-700 dark:bg-slate-900/60 dark:text-white dark:hover:bg-slate-900;
+  }
+
+  /* Touch-friendly interactive elements */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Responsive table scroll wrapper */
+  .table-scroll {
+    @apply -mx-3 sm:mx-0 overflow-x-auto;
+  }
+
+  .table-scroll table {
+    @apply min-w-[600px] sm:min-w-0 w-full;
   }
 }
+
+/* ─── Animations ─── */
 @keyframes cloth-wave {
   0% { transform: rotateY(0deg) rotateX(0deg) translateZ(0px) skewY(0deg) scale(1); }
   25% { transform: rotateY(3deg) rotateX(1deg) translateZ(15px) skewY(1deg) scale(1.02); }
@@ -73,4 +104,19 @@
 
 .animate-cloth-folds {
   animation: cloth-folds 18s linear infinite;
+}
+
+/* Reduce animations on mobile for performance */
+@media (max-width: 767px) {
+  .animate-cloth-wave {
+    animation: none;
+  }
+}
+
+/* Custom scrollbar for notification panels */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-600 rounded-full;
 }

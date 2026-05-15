@@ -71,10 +71,10 @@ export default function ProjectsPage() {
         title="Discover the latest innovations"
         description="Explore groundbreaking projects from students across the region."
       />
-      <section className="section-shell py-8">
+      <section className="section-shell py-4 sm:py-8">
         
         {/* Filters and Search */}
-        <div className="glass-card mb-8 grid gap-4 p-5 md:grid-cols-[1fr_auto]">
+        <div className="glass-card mb-4 sm:mb-8 grid gap-3 sm:gap-4 p-3 sm:p-5 md:grid-cols-[1fr_auto]">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
             <input 
               className="rounded-xl border border-slate-300 bg-white/70 px-4 py-2.5 dark:border-slate-700 dark:bg-slate-900/70 md:w-64" 
@@ -102,12 +102,12 @@ export default function ProjectsPage() {
           </div>
           
           {/* Tabs */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0 -mx-1 px-1">
             {tabs.map(t => (
               <button 
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+                className={`rounded-xl px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
                   tab === t.id 
                     ? "bg-primary-600 text-white shadow-md shadow-primary-500/20" 
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
@@ -121,14 +121,14 @@ export default function ProjectsPage() {
 
         {/* Project Grid */}
         {loading && projects.length === 0 ? (
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} className="glass-card h-[400px] animate-pulse"></div>
             ))}
           </div>
         ) : projects.length > 0 ? (
           <>
-            <div className="grid gap-6 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
               {projects.map((project) => (
                 <ProjectCard key={project._id || project.id} project={project} />
               ))}

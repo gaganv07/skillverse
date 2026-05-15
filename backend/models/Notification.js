@@ -7,14 +7,22 @@ const notificationSchema = new mongoose.Schema(
       ref: "User",
       required: true
     },
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    },
     type: {
       type: String,
-      enum: ["like", "comment", "follow", "approval", "competition", "system"],
+      enum: ["project_approved", "project_rejected", "project_featured", "project_revision", "comment", "competition", "announcement", "system"],
       required: true
     },
-    title: String,
+    title: { type: String, required: true },
     message: String,
     actionUrl: String,
+    relatedProject: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project"
+    },
     read: {
       type: Boolean,
       default: false
@@ -22,6 +30,8 @@ const notificationSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+notificationSchema.index({ recipient: 1, read: 1, createdAt: -1 });
 
 const Notification = mongoose.model("Notification", notificationSchema);
 export default Notification;

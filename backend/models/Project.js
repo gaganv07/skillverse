@@ -40,9 +40,16 @@ const projectSchema = new mongoose.Schema(
     demoLink: String,
     status: {
       type: String,
-      enum: ["draft", "pending", "approved", "featured", "rejected", "disabled"],
+      enum: ["draft", "pending", "approved", "featured", "rejected", "revision", "disabled"],
       default: "pending"
     },
+    // Review workflow fields
+    reviewedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    },
+    reviewComment: String,
+    reviewedAt: Date,
     metrics: {
       likes: { type: Number, default: 0 },
       comments: { type: Number, default: 0 },

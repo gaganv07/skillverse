@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "../../providers/ThemeProvider";
 import { useLanguage } from "../../providers/LanguageProvider";
 import { useAuth, getRoleRedirect } from "../../providers/AuthProvider";
+import NotificationDropdown from "./NotificationDropdown";
 
 const publicLinks = [
   { to: "/projects", label: "Projects" },
@@ -64,6 +65,7 @@ export function Navbar() {
             </button>
             {user ? (
               <div className="flex items-center gap-2">
+                <NotificationDropdown />
                 <span className="hidden text-xs font-medium text-slate-500 dark:text-slate-400 sm:inline-block">
                   {user.fullName}
                 </span>

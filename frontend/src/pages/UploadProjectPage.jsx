@@ -57,7 +57,7 @@ export default function UploadProjectPage() {
       const res = await api.post("/projects", projectData);
       
       if (res.data?.success) {
-        navigate("/projects");
+        navigate("/my-projects");
       }
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Failed to upload project");
@@ -128,8 +128,13 @@ export default function UploadProjectPage() {
             </div>
           </div>
 
-          <button disabled={loading} type="submit" className="primary-button w-full mt-4 flex items-center justify-center">
-            {loading ? "Uploading Project..." : "Publish Project"}
+          <div className="rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200/60 dark:border-blue-500/20 px-4 py-3 text-sm text-blue-700 dark:text-blue-300 flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="w-5 h-5 shrink-0 mt-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Your project will be submitted for review. A teacher or admin will approve it before it appears publicly.</span>
+          </div>
+
+          <button disabled={loading} type="submit" className="primary-button w-full mt-2 flex items-center justify-center">
+            {loading ? "Submitting Project..." : "Submit for Review"}
           </button>
         </form>
       </section>

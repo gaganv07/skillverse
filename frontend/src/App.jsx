@@ -20,6 +20,7 @@ import AdminDashboardPage from "./pages/AdminDashboardPage";
 import SearchPage from "./pages/SearchPage";
 import MessagesPage from "./pages/MessagesPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import NotificationsPage from "./pages/NotificationsPage";
 import SchoolProfilePage from "./pages/SchoolProfilePage";
 
 export default function App() {
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
         </Route>
 
         {/* Role-based Protected Routes */}

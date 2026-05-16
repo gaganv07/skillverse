@@ -22,7 +22,7 @@ export default function RegisterPage() {
     setError(null);
     try {
       await register(form);
-      navigate("/feed");
+      navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "An error occurred during registration.");
     }

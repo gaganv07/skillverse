@@ -6,14 +6,25 @@ import TeacherProfile from "../models/TeacherProfile.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { generateToken } from "../utils/generateToken.js";
 
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const respondWithAuth = (res, user) => {
-  const token = generateToken(user._id || user.id);
-  console.log("[AUTH] Token generated for user:", user.email, "role:", user.role);
-  res.status(200).json({
-    success: true,
-    token,
-    user
-  });
+  try {
+    const token = generateToken(user._id || user.id);
+    console.log("[AUTH] JWT generation succeeded for:", user.email, "| role:", user.role);
+    res.status(200).json({
+      success: true,
+      token,
+      user
+    });
+  } catch (error) {
+    console.error("[AUTH] JWT generation failed for:", user.email, "| error:", error.message);
+    res.status(500).json({
+      success: false,
+      errorCode: "JWT_GENERATION_FAILED",
+      message: "Authentication failed"
+    });
+  }
 };
 
 export const register = catchAsync(async (req, res) => {
@@ -58,71 +69,78 @@ export const register = catchAsync(async (req, res) => {
 
 export const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
+  const normalizedEmail = email?.toLowerCase().trim();
 
-  console.log("[AUTH] Login attempt for email:", email);
+  console.log("[AUTH] Login attempt received | email:", email, "| normalized:", normalizedEmail);
 
-  // Validate input
   if (!email || !password) {
     console.log("[AUTH] Missing email or password");
     return res.status(400).json({
       success: false,
+      errorCode: "MISSING_CREDENTIALS",
       message: "Please provide both email and password"
     });
   }
 
-  // Find user with password field included
-  const user = await User.findOne({ email: email.toLowerCase().trim() }).select("+password");
+  const user = await User.findOne({
+    email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, "i")
+  }).select("+password");
 
   if (!user) {
-    console.log("[AUTH] No user found with email:", email);
+    console.log("[AUTH] User lookup result: NOT_FOUND | normalized email:", normalizedEmail);
     return res.status(401).json({
       success: false,
-      message: "No account found with this email address"
+      errorCode: "USER_NOT_FOUND",
+      message: "User not found"
     });
   }
 
-  console.log("[AUTH] User found:", user.email, "| role:", user.role, "| hasPassword:", !!user.password);
+  console.log("[AUTH] User lookup result: FOUND | email:", user.email, "| role:", user.role, "| hasPassword:", !!user.password);
 
-  // Verify password exists on the user document
   if (!user.password) {
-    console.log("[AUTH] User has no password set");
+    console.log("[AUTH] User has no password set | email:", user.email);
     return res.status(401).json({
       success: false,
-      message: "Account password is not configured. Please reset your password."
+      errorCode: "PASSWORD_NOT_CONFIGURED",
+      message: "Authentication failed"
     });
   }
 
-  // Compare password using bcrypt
+  const passwordLooksHashed = user.password.startsWith("$2");
+  console.log("[AUTH] Password hash format valid:", passwordLooksHashed, "| email:", user.email);
+
   let isMatch = false;
   try {
     isMatch = await bcrypt.compare(password, user.password);
-    console.log("[AUTH] bcrypt.compare result:", isMatch);
+    console.log("[AUTH] bcrypt.compare result:", isMatch, "| email:", user.email);
   } catch (bcryptError) {
-    console.error("[AUTH] bcrypt comparison error:", bcryptError.message);
+    console.error("[AUTH] bcrypt comparison error | email:", user.email, "| error:", bcryptError.message);
     return res.status(500).json({
       success: false,
-      message: "Password verification failed. Please try again."
+      errorCode: "BCRYPT_COMPARE_FAILED",
+      message: "Server error"
     });
   }
 
   if (!isMatch) {
-    console.log("[AUTH] Password mismatch for user:", email);
+    console.log("[AUTH] Password mismatch | email:", user.email, "| hashFormatValid:", passwordLooksHashed);
     return res.status(401).json({
       success: false,
-      message: "Incorrect password. Please try again."
+      errorCode: passwordLooksHashed ? "INVALID_PASSWORD" : "INVALID_PASSWORD_HASH",
+      message: passwordLooksHashed ? "Invalid password" : "Authentication failed"
     });
   }
 
-  // Check if user account is active
   if (user.isActive === false) {
-    console.log("[AUTH] Inactive account:", email);
+    console.log("[AUTH] Inactive account:", user.email);
     return res.status(403).json({
       success: false,
+      errorCode: "ACCOUNT_INACTIVE",
       message: "Your account has been deactivated. Please contact an administrator."
     });
   }
 
-  console.log("[AUTH] Login successful for:", email, "| role:", user.role);
+  console.log("[AUTH] Login successful | email:", user.email, "| role:", user.role);
 
   respondWithAuth(res, {
     id: user._id,
@@ -187,20 +205,23 @@ export const verifyEmail = catchAsync(async (req, res) => {
   res.json({ success: true, message: "Email verified successfully" });
 });
 
-// Debug endpoint — remove in production
+// Debug endpoint - remove in production
 export const debugLogin = catchAsync(async (req, res) => {
   const { email } = req.body;
+  const normalizedEmail = email?.toLowerCase().trim();
 
   if (!email) {
-    return res.status(400).json({ success: false, message: "Email required" });
+    return res.status(400).json({ success: false, errorCode: "EMAIL_REQUIRED", message: "Email required" });
   }
 
-  const user = await User.findOne({ email: email.toLowerCase().trim() }).select("+password");
+  const user = await User.findOne({
+    email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, "i")
+  }).select("+password");
 
   if (!user) {
     return res.json({
       success: false,
-      debug: { userFound: false, email }
+      debug: { userFound: false, email, normalizedEmail }
     });
   }
 
@@ -212,6 +233,7 @@ export const debugLogin = catchAsync(async (req, res) => {
     debug: {
       userFound: true,
       email: user.email,
+      normalizedEmail,
       role: user.role,
       isActive: user.isActive,
       isVerified: user.isVerified,

@@ -3,26 +3,41 @@ import { api } from "../lib/api";
 
 const AuthContext = createContext(null);
 
-// Role-based redirect mapping
 const ROLE_REDIRECTS = {
   admin: "/admin-dashboard",
   teacher: "/teacher-dashboard",
-  student: "/feed",
-  mentor: "/feed",
-  school: "/feed",
-  organizer: "/feed"
+  student: "/dashboard",
+  mentor: "/dashboard",
+  school: "/dashboard",
+  organizer: "/dashboard"
 };
 
 export function getRoleRedirect(role) {
-  return ROLE_REDIRECTS[role] || "/feed";
+  return ROLE_REDIRECTS[role] || "/dashboard";
+}
+
+function normalizeLoginError(error) {
+  if (!error.response) {
+    return "Unable to connect to server. Please check your connection.";
+  }
+
+  const status = error.response.status;
+  const errorCode = error.response.data?.errorCode;
+  const backendMessage = error.response.data?.message;
+
+  if (errorCode === "USER_NOT_FOUND") return "User not found";
+  if (errorCode === "INVALID_PASSWORD") return "Invalid password";
+  if (errorCode === "INVALID_PASSWORD_HASH" || errorCode === "PASSWORD_NOT_CONFIGURED") return "Authentication failed";
+  if (status >= 500 || errorCode === "BCRYPT_COMPARE_FAILED" || errorCode === "JWT_GENERATION_FAILED") return "Server error";
+
+  return backendMessage || "Authentication failed";
 }
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Start true for initial session check
+  const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
 
-  // On mount, check for existing session token
   useEffect(() => {
     const token = localStorage.getItem("skillverse_token");
     if (!token) {
@@ -59,23 +74,11 @@ export function AuthProvider({ children }) {
         return { success: true, user: response.data.user };
       }
 
-      // Unexpected response shape
-      const message = response.data?.message || "Login failed. Please try again.";
+      const message = response.data?.message || "Authentication failed";
       setAuthError(message);
       return { success: false, message };
     } catch (error) {
-      let message = "Login failed. Please try again.";
-
-      if (error.response?.data?.message) {
-        // Always prefer the backend's specific error message
-        message = error.response.data.message;
-      } else if (!error.response) {
-        // Network error — server unreachable
-        message = "Unable to connect to server. Please check your connection.";
-      } else if (error.response.status >= 500) {
-        message = "Server error. Please try again later.";
-      }
-
+      const message = normalizeLoginError(error);
       setAuthError(message);
       return { success: false, message };
     }

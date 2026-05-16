@@ -119,7 +119,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:py-12">
+    <div className="flex min-h-[calc(100vh-5.5rem)] w-full flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-10 lg:py-12">
       {/* Decorative background elements */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-20 w-72 h-72 bg-brand-400/10 rounded-full blur-3xl animate-pulse" />
@@ -128,7 +128,7 @@ export default function LoginPage() {
       </div>
 
       {/* Logo */}
-      <div className="mb-5 sm:mb-8 flex flex-col items-center">
+      <div className="mb-5 flex max-w-md flex-col items-center text-center sm:mb-8">
         <div className="relative mb-4">
           <div className="absolute -inset-2 rounded-2xl bg-gradient-to-br from-brand-400/30 to-indigo-400/30 blur-lg" />
           <img
@@ -213,7 +213,7 @@ export default function LoginPage() {
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-400/30 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-300"
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  tabIndex={-1}
+                  aria-pressed={showPassword}
                 >
                   {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
@@ -264,7 +264,7 @@ export default function LoginPage() {
         </div>
 
         {/* Security footer */}
-        <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+        <div className="mt-6 flex items-center justify-center gap-1.5 px-2 text-center text-xs text-slate-400 dark:text-slate-500">
           <LockIcon />
           <span>Secured with 256-bit encryption</span>
         </div>

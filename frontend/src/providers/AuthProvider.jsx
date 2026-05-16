@@ -64,13 +64,17 @@ export function AuthProvider({ children }) {
       setAuthError(message);
       return { success: false, message };
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        (error.response?.status === 0
-          ? "Unable to connect to server. Please check your connection."
-          : error.response?.status >= 500
-            ? "Server error. Please try again later."
-            : "Login failed. Please try again.");
+      let message = "Login failed. Please try again.";
+
+      if (error.response?.data?.message) {
+        // Always prefer the backend's specific error message
+        message = error.response.data.message;
+      } else if (!error.response) {
+        // Network error — server unreachable
+        message = "Unable to connect to server. Please check your connection.";
+      } else if (error.response.status >= 500) {
+        message = "Server error. Please try again later.";
+      }
 
       setAuthError(message);
       return { success: false, message };

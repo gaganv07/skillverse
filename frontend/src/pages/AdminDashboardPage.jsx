@@ -1,20 +1,35 @@
 import { useState, useEffect } from "react";
 import { PageHero } from "../components/ui/PageHero";
+import { ApprovalStatusBadge } from "../components/ui/ApprovalStatusBadge";
+import { formatRelativeTime } from "../lib/workflow";
 import { api } from "../lib/api";
 import UserManagementPanel from "../components/admin/UserManagementPanel";
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState("analytics");
   const [loading, setLoading] = useState(true);
-
   const [analytics, setAnalytics] = useState(null);
   const [reports, setReports] = useState([]);
   const [verifications, setVerifications] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [pendingProjects, setPendingProjects] = useState([]);
+  const [moderationHistory, setModerationHistory] = useState([]);
+  const [announcement, setAnnouncement] = useState({
+    title: "",
+    message: "",
+    roles: ["student", "teacher", "admin"],
+    type: "admin_announcement"
+  });
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     if (activeTab !== "users") fetchData(activeTab);
   }, [activeTab]);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3500);
+  };
 
   const fetchData = async (tab) => {
     setLoading(true);
@@ -23,116 +38,160 @@ export default function AdminDashboardPage() {
         const res = await api.get("/admin/analytics");
         if (res.data?.success) setAnalytics(res.data.analytics);
       } else if (tab === "moderation") {
-        const res = await api.get("/admin/reports");
-        if (res.data?.success) setReports(res.data.reports);
+        const [reportsRes, pendingRes, historyRes] = await Promise.all([
+          api.get("/admin/reports"),
+          api.get("/projects/review/pending"),
+          api.get("/projects/review/history?limit=20")
+        ]);
+        if (reportsRes.data?.success) setReports(reportsRes.data.reports);
+        if (pendingRes.data?.success) setPendingProjects(pendingRes.data.projects);
+        if (historyRes.data?.success) setModerationHistory(historyRes.data.actions);
       } else if (tab === "verification") {
         const res = await api.get("/admin/verifications");
         if (res.data?.success) setVerifications(res.data.requests);
       } else if (tab === "logs") {
         const res = await api.get("/admin/logs");
         if (res.data?.success) setLogs(res.data.logs);
+      } else if (tab === "announcements") {
+        setLoading(false);
+        return;
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
+      showToast("Failed to load admin data", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleModerateUser = async (id, isActive) => {
-    try {
-      await api.patch(`/admin/users/${id}/moderate`, { isActive: !isActive });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const handleResolveReport = async (id, status) => {
     try {
-      await api.patch(`/admin/reports/${id}/resolve`, { status, adminNotes: "Resolved from dashboard" });
+      await api.patch(`/admin/reports/${id}/resolve`, { status, adminNotes: "Resolved from admin dashboard" });
       fetchData("moderation");
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
     }
   };
 
   const handleProcessVerification = async (id, status) => {
     try {
-      await api.patch(`/admin/verifications/${id}/process`, { status, adminNotes: "Processed from dashboard" });
+      await api.patch(`/admin/verifications/${id}/process`, { status, adminNotes: "Processed from admin dashboard" });
       fetchData("verification");
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleProjectAction = async (projectId, action, reviewComment = "") => {
+    const endpointMap = {
+      approve: "approve",
+      reject: "reject",
+      revision: "request-revision",
+      feature: "feature",
+      remove: "remove"
+    };
+
+    try {
+      await api.patch(`/projects/${projectId}/${endpointMap[action]}`, { reviewComment });
+      showToast(`Project ${action} action completed`);
+      fetchData("moderation");
+    } catch (error) {
+      showToast(error.response?.data?.message || "Project moderation failed", "error");
+    }
+  };
+
+  const handleSendAnnouncement = async (event) => {
+    event.preventDefault();
+    try {
+      const res = await api.post("/admin/announcements", announcement);
+      showToast(`Announcement sent to ${res.data?.count || 0} users`);
+      setAnnouncement({
+        title: "",
+        message: "",
+        roles: ["student", "teacher", "admin"],
+        type: "admin_announcement"
+      });
+    } catch (error) {
+      showToast(error.response?.data?.message || "Failed to send announcement", "error");
     }
   };
 
   const tabs = [
-    { id: "analytics", label: "Analytics", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
-    { id: "users", label: "User Management", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
-    { id: "moderation", label: "Moderation", icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" },
-    { id: "verification", label: "Verification", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
-    { id: "logs", label: "Activity Logs", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" }
+    { id: "analytics", label: "Analytics" },
+    { id: "users", label: "User Management" },
+    { id: "moderation", label: "Project Workflow" },
+    { id: "verification", label: "Verification" },
+    { id: "announcements", label: "Announcements" },
+    { id: "logs", label: "Activity Logs" }
   ];
 
   return (
     <div>
       <PageHero
-        badge="Enterprise Command Center"
+        badge="Operational Command Center"
         title="Admin Dashboard"
-        description="Manage users, moderate content, process verifications, and monitor platform activity."
+        description="Override approvals, feature standout projects, remove inappropriate content, send announcements, and monitor workflow history."
       />
 
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-8">
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-4 sm:mb-8 border-b border-slate-200 dark:border-slate-800 pb-3 sm:pb-4 overflow-x-auto -mx-1 px-1">
+      {toast && (
+        <div className={`fixed right-6 top-24 z-[200] max-w-sm rounded-2xl border px-5 py-3 text-sm font-medium shadow-lg backdrop-blur-xl ${
+          toast.type === "error"
+            ? "border-red-200/60 bg-red-50/90 text-red-700 dark:border-red-500/20 dark:bg-red-900/80 dark:text-red-200"
+            : "border-emerald-200/60 bg-emerald-50/90 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-900/80 dark:text-emerald-200"
+        }`}>
+          {toast.message}
+        </div>
+      )}
+
+      <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-8">
+        <div className="mb-4 flex gap-2 overflow-x-auto border-b border-slate-200 pb-3 dark:border-slate-800 sm:mb-8 sm:pb-4">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm whitespace-nowrap transition-all ${
+              className={`rounded-xl px-3 py-2 text-xs font-medium whitespace-nowrap transition-all sm:px-4 sm:py-2.5 sm:text-sm ${
                 activeTab === tab.id
                   ? "bg-brand-600 text-white shadow-md shadow-brand-500/20"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="w-4 h-4 shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d={tab.icon}/></svg>
-              <span className="hidden xs:inline sm:inline">{tab.label}</span>
+              {tab.label}
             </button>
           ))}
         </div>
 
-        {/* Tab Content */}
         {activeTab === "users" ? (
           <UserManagementPanel />
         ) : loading ? (
-          <div className="py-20 text-center text-slate-500 flex items-center justify-center gap-2">
-            <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          <div className="flex items-center justify-center gap-2 py-20 text-slate-500">
+            <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
             Loading {activeTab} data...
           </div>
         ) : (
           <div className="space-y-6">
             {activeTab === "analytics" && analytics && (
               <>
-                <div className="grid gap-3 sm:gap-6 grid-cols-2 md:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-5 sm:gap-6">
                   {[
                     { label: "Total Students", value: analytics.overview.totalStudents, color: "border-emerald-500" },
                     { label: "Total Schools", value: analytics.overview.totalSchools, color: "border-blue-500" },
                     { label: "Total Projects", value: analytics.overview.totalProjects, color: "border-purple-500" },
                     { label: "Competitions", value: analytics.overview.totalCompetitions, color: "border-amber-500" },
                     { label: "Verified Users", value: analytics.overview.verifiedUsers, color: "border-brand-500" }
-                  ].map((stat, i) => (
-                    <div key={i} className={`glass-card p-4 sm:p-6 border-t-4 ${stat.color}`}>
-                      <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">{stat.label}</p>
-                      <p className="mt-1 sm:mt-2 font-display text-2xl sm:text-4xl font-bold">{stat.value}</p>
+                  ].map((stat) => (
+                    <div key={stat.label} className={`glass-card border-t-4 p-4 sm:p-6 ${stat.color}`}>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs">{stat.label}</p>
+                      <p className="mt-1 font-display text-2xl font-bold sm:mt-2 sm:text-4xl">{stat.value}</p>
                     </div>
                   ))}
                 </div>
-                <div className="glass-card p-4 sm:p-6 mt-4 sm:mt-8">
-                  <h3 className="font-display text-lg sm:text-xl font-bold mb-4 sm:mb-6">Trending Technologies & Categories</h3>
-                  <div className="flex flex-wrap gap-2 sm:gap-4">
-                    {analytics.categories?.map((cat, i) => (
-                      <div key={i} className="bg-slate-100 dark:bg-slate-800 px-3 sm:px-4 py-2 sm:py-3 rounded-xl flex items-center justify-between min-w-[140px] sm:min-w-[200px]">
-                        <span className="font-medium capitalize">{cat._id}</span>
-                        <span className="badge">{cat.count}</span>
+                <div className="glass-card p-4 sm:p-6">
+                  <h3 className="mb-4 font-display text-lg font-bold sm:text-xl">Top project categories</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {analytics.categories?.map((category) => (
+                      <div key={category._id} className="flex min-w-[180px] items-center justify-between rounded-xl bg-slate-100 px-4 py-3 dark:bg-slate-800">
+                        <span className="font-medium capitalize">{category._id}</span>
+                        <span className="badge">{category.count}</span>
                       </div>
                     ))}
                   </div>
@@ -141,80 +200,217 @@ export default function AdminDashboardPage() {
             )}
 
             {activeTab === "moderation" && (
-              <div className="glass-card overflow-hidden">
-                <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm whitespace-nowrap">
-                  <thead className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50">
-                    <tr>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Target</th>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Reason</th>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                    {reports.length === 0 ? (
-                      <tr><td colSpan="4" className="px-6 py-12 text-center text-slate-400">No reports to review</td></tr>
-                    ) : reports.map(r => (
-                      <tr key={r._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                        <td className="px-6 py-4 capitalize font-medium">{r.targetType}</td>
-                        <td className="px-6 py-4">
-                          <div className="capitalize text-red-600 font-medium">{r.reason}</div>
-                          <div className="text-slate-500 truncate max-w-xs">{r.description}</div>
-                        </td>
-                        <td className="px-6 py-4 capitalize">
-                          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${r.status === "resolved" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>{r.status}</span>
-                        </td>
-                        <td className="px-6 py-4 text-right flex justify-end gap-3">
-                          {r.status === "pending" && (
-                            <>
-                              <button onClick={() => handleResolveReport(r._id, "resolved")} className="text-green-600 font-medium hover:underline text-sm">Resolve</button>
-                              <button onClick={() => handleResolveReport(r._id, "dismissed")} className="text-slate-500 font-medium hover:underline text-sm">Dismiss</button>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <>
+                <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+                  <div className="glass-card p-5 sm:p-6">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <h3 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Pending project approvals</h3>
+                        <p className="mt-1 text-sm text-slate-500">Admin overrides, featuring, and moderation actions for the public feed.</p>
+                      </div>
+                      <span className="badge">{pendingProjects.length} waiting</span>
+                    </div>
+
+                    <div className="mt-5 space-y-4">
+                      {pendingProjects.length === 0 ? (
+                        <div className="py-10 text-center text-slate-400">No pending projects right now.</div>
+                      ) : pendingProjects.map((project) => (
+                        <div key={project._id} className="rounded-3xl border border-slate-200/70 bg-white/70 p-4 dark:border-slate-700/70 dark:bg-slate-900/60">
+                          <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="font-semibold text-slate-900 dark:text-white">{project.title}</p>
+                                <ApprovalStatusBadge status={project.status} compact />
+                              </div>
+                              <p className="mt-1 text-sm text-slate-500">{project.student?.fullName} · {project.schoolName || project.student?.schoolName} · {project.category}</p>
+                              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{project.description}</p>
+                            </div>
+                            <div className="flex flex-wrap gap-2 lg:w-[250px]">
+                              <button onClick={() => handleProjectAction(project._id, "approve")} className="rounded-xl bg-emerald-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-600">Approve</button>
+                              <button onClick={() => handleProjectAction(project._id, "feature")} className="rounded-xl bg-gradient-to-r from-purple-500 to-amber-500 px-3 py-2 text-xs font-semibold text-white transition hover:opacity-90">Feature</button>
+                              <button onClick={() => handleProjectAction(project._id, "revision", "Please address the review issues and resubmit.")} className="rounded-xl bg-blue-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-600">Revision</button>
+                              <button onClick={() => handleProjectAction(project._id, "reject", "This submission does not meet approval requirements yet.")} className="rounded-xl bg-red-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-600">Reject</button>
+                              <button onClick={() => handleProjectAction(project._id, "remove", "Removed by admin moderation.")} className="rounded-xl bg-slate-800 px-3 py-2 text-xs font-semibold text-white transition hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600">Remove</button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="glass-card p-5 sm:p-6">
+                    <h3 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Moderation history</h3>
+                    <p className="mt-1 text-sm text-slate-500">Recent approval overrides, feature decisions, and workflow actions.</p>
+                    <div className="mt-5 space-y-3">
+                      {moderationHistory.length === 0 ? (
+                        <div className="py-10 text-center text-slate-400">No workflow history yet.</div>
+                      ) : moderationHistory.map((entry) => (
+                        <div key={entry._id} className="rounded-2xl border border-slate-200/60 bg-white/70 px-4 py-3 dark:border-slate-700/60 dark:bg-slate-900/60">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="font-medium text-slate-900 dark:text-white">{entry.project?.title}</p>
+                            <ApprovalStatusBadge status={entry.toStatus} compact />
+                          </div>
+                          <p className="mt-1 text-xs text-slate-500">{entry.actor?.fullName} · {entry.actorRole} · {formatRelativeTime(entry.createdAt)}</p>
+                          {entry.comment && <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{entry.comment}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
+
+                <div className="glass-card overflow-hidden">
+                  <div className="border-b border-slate-200/50 px-5 py-4 dark:border-slate-700/50">
+                    <h3 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Abuse and moderation reports</h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full whitespace-nowrap text-left text-sm">
+                      <thead className="border-b border-slate-200/50 bg-slate-50/80 dark:border-slate-700/50 dark:bg-slate-800/50">
+                        <tr>
+                          <th className="px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Target</th>
+                          <th className="px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Reason</th>
+                          <th className="px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                          <th className="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                        {reports.length === 0 ? (
+                          <tr><td colSpan="4" className="px-6 py-12 text-center text-slate-400">No reports to review</td></tr>
+                        ) : reports.map((report) => (
+                          <tr key={report._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                            <td className="px-6 py-4 font-medium capitalize">{report.targetType}</td>
+                            <td className="px-6 py-4">
+                              <div className="font-medium capitalize text-red-600">{report.reason}</div>
+                              <div className="max-w-xs truncate text-slate-500">{report.description}</div>
+                            </td>
+                            <td className="px-6 py-4 capitalize">
+                              <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${report.status === "resolved" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>{report.status}</span>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              {report.status === "pending" && (
+                                <div className="flex justify-end gap-3">
+                                  <button onClick={() => handleResolveReport(report._id, "resolved")} className="text-sm font-medium text-green-600 hover:underline">Resolve</button>
+                                  <button onClick={() => handleResolveReport(report._id, "dismissed")} className="text-sm font-medium text-slate-500 hover:underline">Dismiss</button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
             )}
 
             {activeTab === "verification" && (
               <div className="glass-card overflow-hidden">
                 <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm whitespace-nowrap">
-                  <thead className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50">
-                    <tr>
-                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Requested By</th>
-                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Target Type</th>
-                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Status</th>
-                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                    {verifications.length === 0 ? (
-                      <tr><td colSpan="4" className="px-6 py-12 text-center text-slate-400">No verification requests</td></tr>
-                    ) : verifications.map(v => (
-                      <tr key={v._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                        <td className="px-4 sm:px-6 py-4 font-medium">{v.requestedBy?.fullName}</td>
-                        <td className="px-4 sm:px-6 py-4 capitalize">{v.targetType}</td>
-                        <td className="px-4 sm:px-6 py-4 capitalize">
-                          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${v.status === "approved" ? "bg-green-100 text-green-700" : v.status === "rejected" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>{v.status}</span>
-                        </td>
-                        <td className="px-4 sm:px-6 py-4 text-right flex justify-end gap-3">
-                          {v.status === "pending" && (
-                            <>
-                              <button onClick={() => handleProcessVerification(v._id, "approved")} className="text-green-600 font-medium hover:underline text-sm">Approve</button>
-                              <button onClick={() => handleProcessVerification(v._id, "rejected")} className="text-red-600 font-medium hover:underline text-sm">Reject</button>
-                            </>
-                          )}
-                        </td>
+                  <table className="w-full whitespace-nowrap text-left text-sm">
+                    <thead className="border-b border-slate-200/50 bg-slate-50/80 dark:border-slate-700/50 dark:bg-slate-800/50">
+                      <tr>
+                        <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 sm:px-6">Requested By</th>
+                        <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 sm:px-6">Target Type</th>
+                        <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 sm:px-6">Status</th>
+                        <th className="px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 sm:px-6">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                      {verifications.length === 0 ? (
+                        <tr><td colSpan="4" className="px-6 py-12 text-center text-slate-400">No verification requests</td></tr>
+                      ) : verifications.map((verification) => (
+                        <tr key={verification._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                          <td className="px-4 py-4 font-medium sm:px-6">{verification.requestedBy?.fullName}</td>
+                          <td className="px-4 py-4 capitalize sm:px-6">{verification.targetType}</td>
+                          <td className="px-4 py-4 capitalize sm:px-6">
+                            <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+                              verification.status === "approved"
+                                ? "bg-green-100 text-green-700"
+                                : verification.status === "rejected"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-amber-100 text-amber-700"
+                            }`}>{verification.status}</span>
+                          </td>
+                          <td className="px-4 py-4 text-right sm:px-6">
+                            {verification.status === "pending" && (
+                              <div className="flex justify-end gap-3">
+                                <button onClick={() => handleProcessVerification(verification._id, "approved")} className="text-sm font-medium text-green-600 hover:underline">Approve</button>
+                                <button onClick={() => handleProcessVerification(verification._id, "rejected")} className="text-sm font-medium text-red-600 hover:underline">Reject</button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "announcements" && (
+              <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
+                <form onSubmit={handleSendAnnouncement} className="glass-card p-5 sm:p-6">
+                  <h3 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Broadcast notification</h3>
+                  <p className="mt-1 text-sm text-slate-500">Send admin or competition announcements directly into the notification center.</p>
+
+                  <div className="mt-5 space-y-4">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium">Title</label>
+                      <input value={announcement.title} onChange={(event) => setAnnouncement((current) => ({ ...current, title: event.target.value }))} className="w-full rounded-xl border border-slate-300 bg-white/70 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/70" required />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium">Message</label>
+                      <textarea value={announcement.message} onChange={(event) => setAnnouncement((current) => ({ ...current, message: event.target.value }))} rows="5" className="w-full rounded-xl border border-slate-300 bg-white/70 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/70" required />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium">Notification type</label>
+                      <select value={announcement.type} onChange={(event) => setAnnouncement((current) => ({ ...current, type: event.target.value }))} className="w-full rounded-xl border border-slate-300 bg-white/70 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/70">
+                        <option value="admin_announcement">Admin announcement</option>
+                        <option value="competition_announcement">Competition announcement</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium">Recipients</label>
+                      <div className="flex flex-wrap gap-2">
+                        {["student", "teacher", "admin"].map((role) => {
+                          const selected = announcement.roles.includes(role);
+                          return (
+                            <button
+                              key={role}
+                              type="button"
+                              onClick={() => setAnnouncement((current) => ({
+                                ...current,
+                                roles: selected ? current.roles.filter((item) => item !== role) : [...current.roles, role]
+                              }))}
+                              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                                selected ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                              }`}
+                            >
+                              {role}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <button type="submit" className="primary-button w-full py-3 text-sm">Send notification</button>
+                  </div>
+                </form>
+
+                <div className="glass-card p-5 sm:p-6">
+                  <h3 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Recommended uses</h3>
+                  <div className="mt-5 space-y-4 text-sm text-slate-600 dark:text-slate-300">
+                    <div className="rounded-2xl border border-slate-200/60 bg-white/70 p-4 dark:border-slate-700/60 dark:bg-slate-900/60">
+                      <p className="font-semibold text-slate-900 dark:text-white">Project workflow notices</p>
+                      <p className="mt-1">Use project moderation actions for approvals, rejections, featuring, and revision requests so students get direct clickable updates.</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200/60 bg-white/70 p-4 dark:border-slate-700/60 dark:bg-slate-900/60">
+                      <p className="font-semibold text-slate-900 dark:text-white">Competition announcements</p>
+                      <p className="mt-1">Use the competition type for registration reminders, deadline changes, and publishing event results.</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200/60 bg-white/70 p-4 dark:border-slate-700/60 dark:bg-slate-900/60">
+                      <p className="font-semibold text-slate-900 dark:text-white">Admin announcements</p>
+                      <p className="mt-1">Use platform-wide announcements for maintenance windows, policy updates, and school ecosystem notices.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -222,28 +418,28 @@ export default function AdminDashboardPage() {
             {activeTab === "logs" && (
               <div className="glass-card overflow-hidden">
                 <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm whitespace-nowrap">
-                  <thead className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50">
-                    <tr>
-                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Timestamp</th>
-                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Admin</th>
-                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Action</th>
-                      <th className="px-4 sm:px-6 py-3.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Target</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                    {logs.length === 0 ? (
-                      <tr><td colSpan="4" className="px-6 py-12 text-center text-slate-400">No activity logs yet</td></tr>
-                    ) : logs.map(log => (
-                      <tr key={log._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                        <td className="px-4 sm:px-6 py-4 text-slate-500 text-xs">{new Date(log.createdAt).toLocaleString()}</td>
-                        <td className="px-4 sm:px-6 py-4 font-medium">{log.admin?.fullName}</td>
-                        <td className="px-4 sm:px-6 py-4 font-mono text-xs">{log.action}</td>
-                        <td className="px-4 sm:px-6 py-4 capitalize text-slate-500">{log.targetModel}</td>
+                  <table className="w-full whitespace-nowrap text-left text-sm">
+                    <thead className="border-b border-slate-200/50 bg-slate-50/80 dark:border-slate-700/50 dark:bg-slate-800/50">
+                      <tr>
+                        <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 sm:px-6">Timestamp</th>
+                        <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 sm:px-6">Admin</th>
+                        <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 sm:px-6">Action</th>
+                        <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 sm:px-6">Target</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                      {logs.length === 0 ? (
+                        <tr><td colSpan="4" className="px-6 py-12 text-center text-slate-400">No activity logs yet</td></tr>
+                      ) : logs.map((log) => (
+                        <tr key={log._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                          <td className="px-4 py-4 text-xs text-slate-500 sm:px-6">{new Date(log.createdAt).toLocaleString()}</td>
+                          <td className="px-4 py-4 font-medium sm:px-6">{log.admin?.fullName}</td>
+                          <td className="px-4 py-4 font-mono text-xs sm:px-6">{log.action}</td>
+                          <td className="px-4 py-4 capitalize text-slate-500 sm:px-6">{log.targetModel}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHero } from "../components/ui/PageHero";
 import { api } from "../lib/api";
+import { PROJECT_CATEGORIES } from "../lib/workflow";
 
 export default function UploadProjectPage() {
   const navigate = useNavigate();
@@ -96,13 +97,9 @@ export default function UploadProjectPage() {
               <div>
                 <label className="block text-sm font-medium mb-1">Category</label>
                 <select className="w-full rounded-xl border border-slate-300 bg-white/70 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/70" value={form.category} onChange={(e) => setForm({...form, category: e.target.value})}>
-                  <option value="science">Science</option>
-                  <option value="coding">Coding</option>
-                  <option value="robotics">Robotics</option>
-                  <option value="agriculture">Agriculture</option>
-                  <option value="environment">Environment</option>
-                  <option value="research">Research</option>
-                  <option value="social-impact">Social Impact</option>
+                  {PROJECT_CATEGORIES.map((category) => (
+                    <option key={category.value} value={category.value}>{category.label}</option>
+                  ))}
                 </select>
               </div>
               <div>

@@ -143,12 +143,16 @@ export const login = catchAsync(async (req, res) => {
   console.log("[AUTH] Login successful | email:", user.email, "| role:", user.role);
 
   respondWithAuth(res, {
-    id: user._id,
+    _id: user._id || user.id,
+    id: user._id || user.id,
     fullName: user.fullName,
     email: user.email,
     role: user.role,
     avatar: user.avatar,
-    isVerified: user.isVerified
+    isVerified: user.isVerified,
+    schoolName: user.schoolName,
+    district: user.district,
+    state: user.state
   });
 });
 

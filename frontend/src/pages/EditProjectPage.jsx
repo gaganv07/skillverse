@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageHero } from "../components/ui/PageHero";
 import { api } from "../lib/api";
+import { PROJECT_CATEGORIES } from "../lib/workflow";
 
 export default function EditProjectPage() {
   const { id } = useParams();
@@ -117,13 +118,9 @@ export default function EditProjectPage() {
               <div>
                 <label className="block text-sm font-medium mb-1">Category</label>
                 <select className="w-full rounded-xl border border-slate-300 bg-white/70 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/70" value={form.category} onChange={(e) => setForm({...form, category: e.target.value})}>
-                  <option value="science">Science</option>
-                  <option value="coding">Coding</option>
-                  <option value="robotics">Robotics</option>
-                  <option value="agriculture">Agriculture</option>
-                  <option value="environment">Environment</option>
-                  <option value="research">Research</option>
-                  <option value="social-impact">Social Impact</option>
+                  {PROJECT_CATEGORIES.map((category) => (
+                    <option key={category.value} value={category.value}>{category.label}</option>
+                  ))}
                 </select>
               </div>
               <div>

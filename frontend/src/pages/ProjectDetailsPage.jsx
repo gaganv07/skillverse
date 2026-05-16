@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAuth } from "../providers/AuthProvider";
+import { ApprovalStatusBadge } from "../components/ui/ApprovalStatusBadge";
 
 export default function ProjectDetailsPage() {
   const { id } = useParams();
@@ -96,6 +97,7 @@ export default function ProjectDetailsPage() {
 
   const imageUrl = project.media?.images?.[0] || "https://placehold.co/1200x600?text=No+Image";
   const isOwner = user?._id === project.student?._id || user?._id === project.student;
+  const isModerator = ["teacher", "admin"].includes(user?.role);
   const likedByMe = user && project.likedBy?.includes(user._id);
 
   return (
@@ -107,6 +109,7 @@ export default function ProjectDetailsPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="badge">{project.category}</span>
+              <ApprovalStatusBadge status={project.status} compact />
               <span className="text-sm text-slate-500 flex items-center gap-1">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                 {project.metrics?.views || 0}
@@ -172,6 +175,45 @@ export default function ProjectDetailsPage() {
           <div className="mt-8 prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed">
             <p className="whitespace-pre-wrap">{project.description}</p>
           </div>
+
+          {(isOwner || isModerator) && (project.reviewComment || project.reviewComments?.length > 0) && (
+            <div className="mt-8 rounded-3xl border border-slate-200/70 bg-slate-50/80 p-5 dark:border-slate-700/70 dark:bg-slate-800/60">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Review workflow</h3>
+                  <p className="mt-1 text-sm text-slate-500">Moderation decisions, teacher comments, and resubmission history.</p>
+                </div>
+                <ApprovalStatusBadge status={project.status} compact />
+              </div>
+
+              {project.reviewComment && (
+                <div className="mt-4 rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 dark:border-slate-700/70 dark:bg-slate-900/60">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Latest feedback</p>
+                  <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">{project.reviewComment}</p>
+                </div>
+              )}
+
+              {project.reviewComments?.length > 0 && (
+                <div className="mt-4 space-y-3">
+                  {project.reviewComments.slice().reverse().slice(0, 5).map((entry) => (
+                    <div key={entry._id} className="flex gap-3 rounded-2xl border border-slate-200/60 bg-white/70 px-4 py-3 dark:border-slate-700/60 dark:bg-slate-900/50">
+                      <div className="mt-1 h-2.5 w-2.5 rounded-full bg-brand-500" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
+                            {entry.author?.fullName || "Workflow update"}
+                          </p>
+                          <span className="text-[11px] uppercase tracking-wider text-slate-400">{entry.action.replaceAll("_", " ")}</span>
+                        </div>
+                        {entry.comment && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{entry.comment}</p>}
+                        <p className="mt-1 text-[11px] text-slate-400">{new Date(entry.createdAt).toLocaleString()}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {project.tags?.length > 0 && (
             <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800">
